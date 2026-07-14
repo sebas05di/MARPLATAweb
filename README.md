@@ -10,17 +10,27 @@ Construido con Django + PostgreSQL + Tailwind CSS v4. Cierre de venta por WhatsA
 ## Setup rápido
 
 ```bash
-# 1. Setup automático (crea venv, instala deps, configura DB, compila CSS)
-python scripts/setup.py
+# 1. Crear entorno virtual e instalar dependencias
+python -m venv venv
+.\venv\Scripts\Activate.ps1            # Windows
+source venv/bin/activate               # Mac/Linux
+pip install -r requirements.txt
 
-# 2. Activar venv
-.\venv\Scripts\Activate.ps1   # Windows
-source venv/bin/activate      # Mac/Linux
+# 2. Instalar dependencias Node y compilar CSS
+npm install
+npm run build:css
 
-# 3. Crear superuser
+# 3. Configurar variables de entorno
+copy .env.example .env                 # Windows
+cp .env.example .env                   # Mac/Linux
+# Editá .env con tus valores
+
+# 4. Aplicar migraciones y crear datos base
+python manage.py migrate
+python manage.py seed_pages
 python manage.py createsuperuser
 
-# 4. Correr server
+# 5. Correr server
 python manage.py runserver
 ```
 
@@ -40,8 +50,7 @@ MARPLATA/
 │   ├── catalog/                   # Productos, categorías, variantes, búsqueda
 │   ├── cart/                      # Carrito de compras (sesión)
 │   ├── orders/                    # Pedidos WhatsApp + dashboard de ventas
-│   ├── core/                      # Site config, páginas estáticas, emails
-│   └── emails/                    # (legacy, ahora en core)
+│   └── core/                      # Site config, páginas estáticas, emails
 ├── config/                        # Configuración Django
 │   ├── settings/
 │   │   ├── base.py                # Settings compartidos
@@ -60,34 +69,20 @@ MARPLATA/
 │   └── pages/                     # Home + páginas estáticas
 ├── static/                        # Archivos estáticos
 │   ├── css/
-│   │   ├── tailwind.css           # CSS fuente (Tailwind v4)
-│   │   └── marplata.css           # CSS compilado
+│   │   └── marplata.css           # CSS compilado (Tailwind v4)
 │   ├── js/                        # JavaScript
 │   ├── img/
 │   │   ├── hero/                  # Imágenes del hero
-│   │   ├── products/              # Fotos de productos
-│   │   ├── logos/                 # Logos extraídos del PDF
-│   │   ├── branding/              # Logos optimizados + og:image
-│   │   └── favicons/              # favicon.ico + apple-touch-icon
+│   │   ├── branding/              # og:image y favicons
+│   │   └── favicons/              # Favicon multi-resolución
+│   └── site.webmanifest           # PWA manifest
+├── assets/                        # Fuentes del frontend
+│   └── css/tailwind.css           # CSS fuente (Tailwind v4)
 ├── media/                         # Archivos subidos por usuarios/admin
-│   └── products/                  # Covers y variants de productos
-├── scripts/                       # Scripts de utilidad
-│   ├── setup.py                   # Setup inicial
-│   ├── seed_products.py           # Carga productos de prueba
-│   ├── seed_pages.py              # Carga páginas estáticas
-│   ├── generate_assets.py         # Genera logos + favicons desde PDF
-│   ├── validate_product_images.py # Valida dimensiones de fotos
-│   ├── optimize_product_images.py # Optimiza fotos (resize + WebP)
-│   ├── test_email.py              # Prueba envío de emails
-│   ├── test_e2e.py                # Testing E2E del flujo
-│   └── smoke_test.py              # Verificación rápida pre-deploy
-├── staticfiles/                   # Archivos estáticos para producción (collectstatic)
 ├── DEPLOYMENT.md                  # Guía de deploy a producción
 ├── requirements.txt               # Dependencias Python
 ├── package.json                   # Dependencias Node
-├── .env                           # Variables de entorno (NO commitear)
-├── .env.prod                      # Variables para producción (NO commitear)
-├── .env.example                   # Plantilla de .env (sí commitear)
+├── .env.example                   # Plantilla de .env
 ├── manage.py
 └── README.md                      # Este archivo
 ```
@@ -120,54 +115,17 @@ MARPLATA/
 
 ---
 
-## Scripts útiles
+## Comandos útiles
 
-| Script | Uso |
-|--------|-----|
-| `python scripts/setup.py` | Setup inicial completo |
-| `python scripts/seed_products.py` | Cargar/actualizar productos de prueba |
-| `python scripts/seed_pages.py` | Cargar/actualizar páginas estáticas |
-| `python scripts/generate_assets.py` | Regenerar logos y favicons desde el PDF de marca |
-| `python scripts/validate_product_images.py` | Verificar dimensiones de fotos |
-| `python scripts/optimize_product_images.py` | Optimizar fotos de productos |
-| `python scripts/test_email.py tu@email.com` | Probar envío de emails |
-| `python scripts/test_e2e.py` | Testing E2E del flujo completo |
-| `python scripts/smoke_test.py` | Verificación rápida pre-deploy |
-| `python manage.py makemigrations` | Crear migraciones |
+| Comando | Uso |
+|---------|-----|
 | `python manage.py migrate` | Aplicar migraciones |
+| `python manage.py seed_pages` | Cargar/actualizar páginas estáticas |
 | `python manage.py collectstatic --noinput` | Recopilar estáticos para prod |
 | `python manage.py createsuperuser` | Crear admin |
+| `python manage.py test_cloudinary` | Verificar configuración de Cloudinary |
 | `npm run build:css` | Compilar Tailwind CSS v4 |
 | `npm run watch:css` | Compilar en watch mode |
-
----
-
-## Stack y decisiones técnicas
-
-### Backend
-- **Django 4.2** — Framework web
-- **PostgreSQL 17** — Base de datos
-- **Jazzmin** — Admin UI customizado
-- **django-environ** — Manejo de variables de entorno
-
-### Frontend
-- **Tailwind CSS v4** — Utility-first CSS
-- **Garet** (Fontshare) — Tipografía de headings, oficial de la marca
-- **Jost** (Google Fonts) — Tipografía de body
-- **Alpine.js** (no, no se usa) — Interactividad
-
-### Despliegue
-- **WhiteNoise** — Servir estáticos en producción
-- **Gunicorn** — WSGI server
-- **PostgreSQL gestionado** — Railway / Render / DigitalOcean
-
-### Decisiones de diseño
-- Productos vendidos como piezas separadas (Top + Tanga), no como set
-- Carrito basado en sesión
-- Checkout crea pedido + email de confirmación + redirige a WhatsApp con mensaje pre-llenado
-- El cierre de venta SIEMPRE es en WhatsApp (no hay pasarela de pago)
-- Stock manejado a nivel de variante (combinación color + talle)
-- Imágenes almacenadas en `media/` (filesystem en dev, Cloudinary en prod opcional)
 
 ---
 
@@ -191,35 +149,22 @@ MARPLATA/
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret | (vacío) |
 | `SENTRY_DSN` | Sentry para tracking de errores (opcional) | (vacío) |
 
-Para producción, copiá `.env.example` a `.env.prod` y completá los valores reales.
-
----
-
-## Tipografía y branding
-
-- **Headings:** Garet (Fontshare) con `tracking-[0.25em]`
-- **Body:** Jost (Google Fonts) con peso 300 (light)
-- **Colores:**
-  - Primary: `#6B8BC8` (azul MARPLATA)
-  - Neutral: `#F5EFEB` (fondo crema)
-  - Text: `#2C3E50`
-
-Ver `static/css/tailwind.css` para el theme completo.
+Para producción, copiá `.env.example` a `.env.prod` y completá los valores reales. Ver [`DEPLOYMENT.md`](DEPLOYMENT.md) para la guía completa.
 
 ---
 
 ## Deploy a producción
 
-Ver [`DEPLOYMENT.md`](DEPLOYMENT.md) para la guía completa.
+Ver [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 Resumen:
-1. Provisionar PostgreSQL (Railway / Render / Supabase)
-2. Crear `.env.prod` con valores reales
+1. Provisionar PostgreSQL.
+2. Crear `.env.prod` con valores reales.
 3. `pip install -r requirements.txt`
-4. `python manage.py migrate`
-5. `python manage.py collectstatic --noinput`
-6. `python scripts/seed_products.py`
-7. Iniciar con Gunicorn + WhiteNoise
+4. `npm install && npm run build:css`
+5. `python manage.py migrate`
+6. `python manage.py collectstatic --noinput`
+7. Iniciar con Gunicorn + WhiteNoise.
 
 ---
 
