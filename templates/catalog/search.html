@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-16 lg:py-24 bg-marplata-neutral min-h-[60vh]">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <span class="section-label mb-4 block">Búsqueda</span>
+            <h1 class="font-heading text-4xl lg:text-5xl font-light tracking-tight-custom text-marplata-text mb-6">
+                {% if query %}
+                Resultados para "{{ query }}"
+                {% else %}
+                Buscar productos
+                {% endif %}
+            </h1>
+
+            <form action="{% url 'catalog:search' %}" method="get" class="max-w-2xl mx-auto">
+                <div class="flex gap-2">
+                    <input type="search" name="q" value="{{ query }}" placeholder="¿Qué estás buscando?" autofocus class="flex-1 px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" required>
+                    <button type="submit" class="px-6 py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-wide-custom hover:bg-marplata-primary-dark transition-colors">
+                        Buscar
+                    </button>
+                </div>
+            </form>
+
+            {% if query %}
+            <p class="mt-4 text-sm text-marplata-text-muted">
+                {{ total_results }} {{ total_results|pluralize:"resultado,resultados" }}
+            </p>
+            {% endif %}
+        </div>
+
+        {% if query %}
+            {% if collections %}
+            <div class="mb-10">
+                <h2 class="font-heading text-xl text-marplata-text mb-4">Colecciones</h2>
+                <div class="flex flex-wrap gap-2">
+                    {% for col in collections %}
+                    <a href="{% url 'catalog:product_list_by_collection' col.slug %}" class="px-4 py-2 text-xs font-normal uppercase tracking-wide-custom bg-white border border-marplata-secondary-light text-marplata-text hover:border-marplata-primary transition-colors">
+                        {{ col.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if products %}
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 lg:gap-x-8 lg:gap-y-14">
+                {% for product in products %}
+                <a href="{% url 'product_detail' product.slug %}" class="group block">
+                    <div class="relative aspect-[3/4] overflow-hidden bg-marplata-secondary-light mb-5">
+                        {% if product.primary_image %}
+                        <img src="{{ product.primary_image.url }}" alt="{{ product.name }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        {% else %}
+                        <div class="absolute inset-0 image-placeholder"></div>
+                        {% endif %}
+                        {% if product.available_stock == 0 %}
+                        <span class="absolute top-3 left-3 px-3 py-1 text-[10px] font-normal uppercase tracking-wide-custom bg-marplata-primary text-white">Agotado</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-center">
+                        {% if product.collection %}
+                        <p class="text-xs uppercase tracking-wide-custom text-marplata-text-muted mb-2">{{ product.collection.name }}</p>
+                        {% endif %}
+                        <h3 class="text-base lg:text-lg font-normal text-marplata-text mb-2 group-hover:text-marplata-primary transition-colors">{{ product.name }}</h3>
+                        <p class="text-sm text-marplata-text-light">${{ product.base_price|floatformat:0 }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-marplata-text-muted mb-4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                <h2 class="font-heading text-2xl text-marplata-text mb-3">No encontramos resultados</h2>
+                <p class="text-marplata-text-light mb-6">Probá con otras palabras o explorá toda la colección.</p>
+                <a href="{% url 'catalog:product_list' %}" class="btn-primary">Ver colección completa</a>
+            </div>
+            {% endif %}
+        {% else %}
+        <div class="text-center py-12 max-w-xl mx-auto">
+            <p class="text-marplata-text-light mb-8">Buscá por nombre de producto, color, colección o material. Por ejemplo: <em>"enterizo"</em>, <em>"bikini"</em>, <em>"verano 2026"</em>.</p>
+            <a href="{% url 'catalog:product_list' %}" class="btn-outline">Ver toda la colección</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

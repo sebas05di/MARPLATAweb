@@ -1,0 +1,79 @@
+{% extends 'emails/base.html' %}
+{% load humanize %}
+{% block subject %}¡Pedido {{ order.order_number }} recibido!{% endblock %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-family:Georgia,serif;color:#2C3E50;font-size:24px;font-weight:400;">¡Gracias por tu compra, {{ order.customer_name }}!</h2>
+<p style="margin:0 0 24px;color:#6C7A89;font-size:15px;line-height:1.5;">Recibimos tu pedido y pronto nos pondremos en contacto por WhatsApp para confirmar el pago y los detalles del envío.</p>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#EDF2FA;border-radius:6px;padding:16px;margin-bottom:24px;">
+  <tr>
+    <td>
+      <p style="margin:0;color:#6C7A89;font-size:12px;letter-spacing:1px;">NÚMERO DE PEDIDO</p>
+      <p style="margin:4px 0 0;color:#2C3E50;font-size:18px;font-weight:600;">#{{ order.order_number }}</p>
+      <p style="margin:8px 0 0;color:#6C7A89;font-size:13px;">Estado: <strong style="color:#6B8BC8;">{{ order.get_status_display }}</strong></p>
+    </td>
+  </tr>
+</table>
+
+<h3 style="margin:0 0 12px;font-family:Georgia,serif;color:#2C3E50;font-size:18px;font-weight:400;">Resumen del pedido</h3>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin-bottom:16px;">
+  <thead>
+    <tr style="border-bottom:2px solid #E8E0D8;">
+      <th align="left" style="padding:8px 0;color:#6C7A89;font-size:12px;letter-spacing:1px;">PRODUCTO</th>
+      <th align="center" style="padding:8px 0;color:#6C7A89;font-size:12px;letter-spacing:1px;">CANT.</th>
+      <th align="right" style="padding:8px 0;color:#6C7A89;font-size:12px;letter-spacing:1px;">SUBTOTAL</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr style="border-bottom:1px solid #F5EFEB;">
+      <td style="padding:12px 0;color:#2C3E50;font-size:14px;vertical-align:top;">
+        {{ item.variant.product.name }}<br>
+        <span style="color:#95A5A6;font-size:12px;">{{ item.variant.color.name }}{% if item.variant.size %} · Talla {{ item.variant.size }}{% endif %}</span>
+      </td>
+      <td align="center" style="padding:12px 0;color:#2C3E50;font-size:14px;">{{ item.quantity }}</td>
+      <td align="right" style="padding:12px 0;color:#2C3E50;font-size:14px;">${{ item.subtotal|intcomma }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:24px;">
+  <tr>
+    <td align="right" style="padding:4px 0;color:#6C7A89;font-size:14px;">Subtotal:</td>
+    <td align="right" width="120" style="padding:4px 0 4px 16px;color:#2C3E50;font-size:14px;">${{ order.subtotal_amount|intcomma }}</td>
+  </tr>
+  {% if order.discount_amount %}
+  <tr>
+    <td align="right" style="padding:4px 0;color:#27AE60;font-size:14px;">Descuento{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}:</td>
+    <td align="right" style="padding:4px 0 4px 16px;color:#27AE60;font-size:14px;">-${{ order.discount_amount|intcomma }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td align="right" style="padding:4px 0;color:#6C7A89;font-size:14px;">Envío:</td>
+    <td align="right" style="padding:4px 0 4px 16px;color:#2C3E50;font-size:14px;">{{ order.shipping_cost|default:0|floatformat:0|intcomma }}</td>
+  </tr>
+  <tr style="border-top:2px solid #E8E0D8;">
+    <td align="right" style="padding:12px 0 0;font-family:Georgia,serif;color:#2C3E50;font-size:18px;"><strong>Total:</strong></td>
+    <td align="right" style="padding:12px 0 0 16px;font-family:Georgia,serif;color:#6B8BC8;font-size:20px;"><strong>${{ order.total_amount|intcomma }}</strong></td>
+  </tr>
+</table>
+
+<h3 style="margin:0 0 12px;font-family:Georgia,serif;color:#2C3E50;font-size:18px;font-weight:400;">Datos de envío</h3>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#F5EFEB;border-radius:6px;padding:16px;margin-bottom:24px;">
+  <tr>
+    <td>
+      <p style="margin:0 0 4px;color:#2C3E50;font-size:14px;">{{ order.customer_name }}</p>
+      <p style="margin:0 0 4px;color:#6C7A89;font-size:13px;">{{ order.customer_phone }}</p>
+      <p style="margin:0;color:#6C7A89;font-size:13px;">{{ order.shipping_address }}</p>
+      {% if order.shipping_city %}<p style="margin:4px 0 0;color:#6C7A89;font-size:13px;">{{ order.shipping_city }}{% if order.shipping_department %} · {{ order.shipping_department }}{% endif %}</p>{% endif %}
+      {% if order.shipping_notes %}<p style="margin:8px 0 0;color:#95A5A6;font-size:12px;font-style:italic;">{{ order.shipping_notes }}</p>{% endif %}
+    </td>
+  </tr>
+</table>
+
+<p style="margin:0 0 16px;color:#6C7A89;font-size:14px;line-height:1.5;">Si tenés alguna duda, podés responder este correo o escribirnos por WhatsApp.</p>
+<p style="margin:0;color:#6C7A89;font-size:14px;line-height:1.5;">¡Gracias por elegirnos!</p>
+<p style="margin:24px 0 0;font-family:Georgia,serif;color:#2C3E50;font-size:16px;">Con cariño,<br><strong style="color:{{ primary_color }};">Equipo {{ site_name }}</strong></p>
+{% endblock %}

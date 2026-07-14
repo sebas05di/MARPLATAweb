@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-20 lg:py-28 bg-marplata-neutral min-h-[70vh]">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <span class="section-label mb-4 block">Bienvenido</span>
+            <h1 class="font-heading text-4xl font-light tracking-tight-custom text-marplata-text">Iniciar sesión</h1>
+        </div>
+
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="p-4 text-sm {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-emerald-50 text-emerald-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Correo electrónico</label>
+                <input type="email" name="email" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" placeholder="tu@email.com">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Contraseña</label>
+                <input type="password" name="password" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" placeholder="••••••••">
+            </div>
+            <button type="submit" class="w-full py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-wide-custom hover:bg-marplata-primary-dark transition-colors">
+                Iniciar sesión
+            </button>
+        </form>
+
+        <p class="mt-8 text-center text-sm text-marplata-text-light">
+            ¿No tienes cuenta? <a href="{% url 'accounts:register' %}?next={{ next|urlencode }}" class="text-marplata-primary hover:underline">Regístrate</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

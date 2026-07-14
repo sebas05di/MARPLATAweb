@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-10 lg:py-16 bg-marplata-neutral">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-3 text-xs text-marplata-text-muted mb-10 lg:mb-14">
+            <a href="{% url 'home' %}" class="hover:text-marplata-text transition-colors">Inicio</a>
+            <span>/</span>
+            <a href="{% url 'catalog:product_list' %}" class="hover:text-marplata-text transition-colors">Colecciones</a>
+            {% if product.collection %}
+            <span>/</span>
+            <a href="{% url 'catalog:product_list_by_collection' product.collection.slug %}" class="hover:text-marplata-text transition-colors">{{ product.collection.name }}</a>
+            {% endif %}
+            <span>/</span>
+            <span class="text-marplata-text font-normal">{{ product.name }}</span>
+        </nav>
+
+        <div class="grid lg:grid-cols-2 gap-10 lg:gap-20">
+            <!-- Gallery (columna izquierda) -->
+            <div class="lg:sticky lg:top-28 lg:self-start">
+                <div class="relative aspect-[3/4] overflow-hidden bg-marplata-secondary-light rounded-lg cursor-crosshair group" id="mainImageContainer">
+                    <img id="mainImage" src="{{ product.primary_image.url|default:'' }}" alt="{{ product.name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02] cursor-zoom-in">
+                    <div id="zoomLens" class="absolute w-28 h-28 rounded-full border-2 border-marplata-primary bg-white/10 pointer-events-none opacity-0 transition-opacity duration-200 shadow-[0_0_0_4px_rgba(107,139,200,0.1)]"></div>
+                    <button type="button" id="openLightboxBtn" class="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm text-marplata-text hover:text-marplata-primary transition-colors shadow-soft opacity-0 group-hover:opacity-100" aria-label="Ver imagen ampliada">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-6-6m6 6v-4.8m0 4.8h-4.8M3 16.2V21m0 0h4.8M3 21l6-6M9 3h4.8M21 9V3m0 0h-4.8M21 3l-6 6"></path></svg>
+                    </button>
+                    {% if user.is_authenticated %}
+                    <button type="button" id="wishlistBtn" data-product-id="{{ product.id }}" data-in-wishlist="{{ in_wishlist|yesno:'true,false' }}" class="wishlist-toggle absolute top-4 right-4 w-11 h-11 flex items-center justify-center bg-white/95 backdrop-blur-sm hover:bg-white transition-colors shadow-soft {% if in_wishlist %}text-marplata-danger{% else %}text-marplata-text-muted hover:text-marplata-danger{% endif %}" aria-label="{% if in_wishlist %}Quitar de favoritos{% else %}Agregar a favoritos{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="{% if in_wishlist %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                    </button>
+                    {% endif %}
+                </div>
+                <div id="imageCounter" class="hidden mt-2 text-xs text-marplata-text-muted text-right tracking-wide"></div>
+                <div id="thumbnailContainer" class="flex gap-3 mt-4 overflow-x-auto pb-2">
+                    {% if product.primary_image %}
+                    <img src="{{ product.primary_image.url }}" alt="{{ product.name }}" class="w-16 h-16 lg:w-20 lg:h-20 object-cover border-2 border-marplata-primary opacity-100 flex-shrink-0">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Info (columna derecha) -->
+            <div class="flex flex-col">
+                {% if product.collection %}
+                <span class="section-label mb-4">{{ product.collection.name }}</span>
+                {% endif %}
+
+                <h1 class="font-heading text-4xl lg:text-5xl xl:text-6xl font-light tracking-tight-custom text-marplata-text mb-4">{{ product.name }}</h1>
+
+                <p id="productPrice" class="text-2xl lg:text-3xl font-light text-marplata-text mb-8">${{ product.base_price|floatformat:0 }}</p>
+
+                <!-- Variants -->
+                <div class="border-t border-marplata-secondary-light pt-8">
+                    <!-- Color -->
+                    <div class="mb-6">
+                        <label class="section-label mb-3 block">Color</label>
+                        <div id="colorOptions" class="flex flex-wrap gap-3"></div>
+                    </div>
+
+                    <!-- Size -->
+                    <div class="mb-6">
+                        <div class="flex items-baseline justify-between mb-3">
+                            <label class="section-label block">Talla</label>
+                            <a href="#sizeGuide" class="text-xs text-marplata-text-muted hover:text-marplata-primary transition-colors underline-offset-2 hover:underline">Guía de tallas</a>
+                        </div>
+                        <div id="sizeOptions" class="flex flex-wrap gap-3"></div>
+                    </div>
+
+                    <!-- Cantidad -->
+                    <div class="mb-6">
+                        <label class="section-label mb-3 block">Cantidad</label>
+                        <div class="inline-flex items-center border border-marplata-secondary-light" id="quantitySelector">
+                            <button type="button" id="qtyMinus" class="w-10 h-10 flex items-center justify-center text-marplata-text hover:bg-marplata-secondary-light transition-colors" aria-label="Disminuir cantidad">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path></svg>
+                            </button>
+                            <input type="number" id="quantityInput" value="1" min="1" max="99" class="w-14 h-10 text-center bg-transparent border-0 text-marplata-text text-sm focus:outline-none focus:ring-0" aria-label="Cantidad">
+                            <button type="button" id="qtyPlus" class="w-10 h-10 flex items-center justify-center text-marplata-text hover:bg-marplata-secondary-light transition-colors" aria-label="Aumentar cantidad">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stock -->
+                    <div id="stockInfo" class="mb-6">
+                        <span class="product-detail__stock-status inline-flex items-center gap-2 text-sm font-medium text-marplata-text-muted"></span>
+                    </div>
+
+                    <!-- Actions -->
+                    <button id="addToCartBtn" disabled class="w-full py-4.5 px-8 bg-marplata-primary text-white text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 disabled:bg-marplata-secondary-light disabled:text-marplata-text-muted disabled:cursor-not-allowed hover:bg-marplata-primary-dark hover:-translate-y-0.5 hover:shadow-medium">
+                        Agregar al carrito
+                    </button>
+
+                    <a id="buyWhatsappBtn" href="{% url 'orders:checkout_form' %}" class="mt-3 w-full py-4 px-8 bg-white border-2 border-marplata-primary text-marplata-primary text-xs font-normal uppercase tracking-wide-custom text-center transition-all duration-300 hover:bg-marplata-primary hover:text-white hidden">
+                        Comprar por WhatsApp
+                    </a>
+
+                    <div class="mt-6 flex items-center justify-center gap-6 text-xs text-marplata-text-muted">
+                        <span class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
+                            Pago previo
+                        </span>
+                        <span class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
+                            Envío a todo el país
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acordeones (descripción, composición, guía de tallas, envíos) -->
+        <div class="max-w-3xl mx-auto mt-16 lg:mt-24 space-y-3">
+            <!-- Descripción -->
+            <details class="group bg-white border border-marplata-secondary-light rounded-lg overflow-hidden" open>
+                <summary class="flex items-center justify-between cursor-pointer p-5 lg:p-6 list-none select-none">
+                    <h3 class="font-heading text-lg lg:text-xl font-light text-marplata-text">Descripción</h3>
+                    <span class="w-8 h-8 flex items-center justify-center text-marplata-text-muted group-open:rotate-45 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    </span>
+                </summary>
+                <div class="px-5 lg:px-6 pb-5 lg:pb-6 text-marplata-text-light leading-relaxed font-light">
+                    <p>{{ product.description }}</p>
+                    {% if product.story %}
+                    <p class="mt-4 italic text-marplata-text">{{ product.story }}</p>
+                    {% endif %}
+                </div>
+            </details>
+
+            <!-- Composición y cuidados -->
+            {% if product.materials %}
+            <details class="group bg-white border border-marplata-secondary-light rounded-lg overflow-hidden">
+                <summary class="flex items-center justify-between cursor-pointer p-5 lg:p-6 list-none select-none">
+                    <h3 class="font-heading text-lg lg:text-xl font-light text-marplata-text">Composición y Cuidados</h3>
+                    <span class="w-8 h-8 flex items-center justify-center text-marplata-text-muted group-open:rotate-45 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    </span>
+                </summary>
+                <div class="px-5 lg:px-6 pb-5 lg:pb-6 text-marplata-text-light leading-relaxed font-light">
+                    <p>{{ product.materials }}</p>
+                    <ul class="mt-4 space-y-2 list-disc pl-5 text-sm">
+                        <li>Lavar a mano con agua fría y jabón neutro.</li>
+                        <li>Evitar el uso de blanqueador y suavizante.</li>
+                        <li>Evitar dejar en remojo.</li>
+                        <li>Evitar escurrir o apretar con fuerza.</li>
+                        <li>Secar a la sombra, en superficie plana.</li>
+                        <li>Evitar el uso de secadora y plancha.</li>
+                        <li>Evitar el contacto con superficies ásperas.</li>
+                        <li>Enjuagar con agua después del contacto con mar o piscina.</li>
+                        <li>Evitar guardar la prenda húmeda por periodos prolongados.</li>
+                    </ul>
+                </div>
+            </details>
+            {% endif %}
+
+            <!-- Guía de tallas -->
+            <details id="sizeGuide" class="group bg-white border border-marplata-secondary-light rounded-lg overflow-hidden">
+                <summary class="flex items-center justify-between cursor-pointer p-5 lg:p-6 list-none select-none">
+                    <h3 class="font-heading text-lg lg:text-xl font-light text-marplata-text">Guía de Tallas</h3>
+                    <span class="w-8 h-8 flex items-center justify-center text-marplata-text-muted group-open:rotate-45 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    </span>
+                </summary>
+                <div class="px-5 lg:px-6 pb-5 lg:pb-6 text-marplata-text-light leading-relaxed font-light">
+                    <p class="mb-4">Las medidas son aproximadas y pueden variar según el modelo. Te recomendamos medirte con una prenda similar que te quede bien.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-marplata-secondary-light">
+                                    <th class="text-left py-3 px-2 font-normal text-marplata-text-muted uppercase tracking-wide text-xs">Talla</th>
+                                    <th class="text-center py-3 px-2 font-normal text-marplata-text-muted uppercase tracking-wide text-xs">Busto (cm)</th>
+                                    <th class="text-center py-3 px-2 font-normal text-marplata-text-muted uppercase tracking-wide text-xs">Cintura (cm)</th>
+                                    <th class="text-center py-3 px-2 font-normal text-marplata-text-muted uppercase tracking-wide text-xs">Cadera (cm)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-marplata-text">
+                                <tr class="border-b border-marplata-secondary-light">
+                                    <td class="py-3 px-2">S</td>
+                                    <td class="py-3 px-2 text-center">82-86</td>
+                                    <td class="py-3 px-2 text-center">62-66</td>
+                                    <td class="py-3 px-2 text-center">88-92</td>
+                                </tr>
+                                <tr class="border-b border-marplata-secondary-light">
+                                    <td class="py-3 px-2">M</td>
+                                    <td class="py-3 px-2 text-center">86-90</td>
+                                    <td class="py-3 px-2 text-center">66-70</td>
+                                    <td class="py-3 px-2 text-center">92-96</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-2">L</td>
+                                    <td class="py-3 px-2 text-center">90-94</td>
+                                    <td class="py-3 px-2 text-center">70-74</td>
+                                    <td class="py-3 px-2 text-center">96-100</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Envíos y devoluciones -->
+            <details class="group bg-white border border-marplata-secondary-light rounded-lg overflow-hidden">
+                <summary class="flex items-center justify-between cursor-pointer p-5 lg:p-6 list-none select-none">
+                    <h3 class="font-heading text-lg lg:text-xl font-light text-marplata-text">Envíos y Devoluciones</h3>
+                    <span class="w-8 h-8 flex items-center justify-center text-marplata-text-muted group-open:rotate-45 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    </span>
+                </summary>
+                <div class="px-5 lg:px-6 pb-5 lg:pb-6 text-marplata-text-light leading-relaxed font-light">
+                    <p class="mb-3"><strong class="text-marplata-text">Envíos:</strong> Realizamos envíos a todo el país. El costo y tiempo de entrega dependen de tu ubicación.</p>
+                    <p class="mb-3"><strong class="text-marplata-text">Pago:</strong> Todos los pedidos deben estar pagos en su totalidad antes de ser procesados. No manejamos pagos contra entrega.</p>
+                    <p class="mb-3"><strong class="text-marplata-text">Cambios:</strong> Por razones de higiene, no aceptamos cambios ni devoluciones por talla, gusto personal o preferencias estéticas. Solo se aceptarán cambios por defectos de fabricación, imperfecciones de confección o error en el producto enviado, siempre que se reporten dentro de las primeras 24 horas después de recibirlo.</p>
+                    <a href="{% url 'page_detail' 'envios-devoluciones' %}" class="inline-block mt-2 text-marplata-primary text-sm uppercase tracking-wide-custom hover:text-marplata-primary-dark transition-colors">Ver política completa →</a>
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.productData = {
+    "coverImage": {% if product.primary_image %}"{{ product.primary_image.url|escapejs }}"{% else %}null{% endif %},
+    "variants": [
+        {% for variant in product.variants.all %}
+        {
+            "id": "{{ variant.id }}",
+            "color": "{{ variant.color|escapejs }}",
+            "color_slug": "{{ variant.color_slug|escapejs }}",
+            "size": "{{ variant.size|escapejs }}",
+            "stock": {{ variant.stock }},
+            "price_override": {% if variant.price_override %}{{ variant.price_override }}{% else %}null{% endif %},
+            "images": [
+                {% for img in variant.images.all %}
+                {
+                    "url": "{{ img.image.url|escapejs }}",
+                    "alt": "{{ img.alt_text|default:product.name|escapejs }}"
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    "basePrice": {{ product.base_price|floatformat:0 }}
+};
+</script>
+<script src="{% static 'js/product-detail.js' %}"></script>
+<script src="{% static 'js/quantity-selector.js' %}"></script>
+{% if user.is_authenticated %}
+<script src="{% static 'js/wishlist.js' %}"></script>
+{% endif %}
+
+<div id="imageLightbox" class="fixed inset-0 z-50 hidden bg-black/95 items-center justify-center" role="dialog" aria-modal="true" aria-label="Galería de imágenes">
+  <button type="button" id="closeLightboxBtn" class="absolute top-4 right-4 w-11 h-11 flex items-center justify-center text-white/80 hover:text-white transition-colors z-10" aria-label="Cerrar galería">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+  </button>
+  <button type="button" id="lightboxPrevBtn" class="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-white/80 hover:text-white bg-white/10 hover:bg-white/20 transition-colors z-10" aria-label="Imagen anterior">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+  </button>
+  <button type="button" id="lightboxNextBtn" class="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-white/80 hover:text-white bg-white/10 hover:bg-white/20 transition-colors z-10" aria-label="Siguiente imagen">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+  </button>
+  <img id="lightboxImage" src="" alt="" class="max-w-[90vw] max-h-[85vh] object-contain select-none">
+  <div id="lightboxCounter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-sm tracking-widest"></div>
+  <div id="lightboxThumbs" class="absolute bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 flex gap-2 max-w-[90vw] overflow-x-auto pb-1 px-2"></div>
+</div>
+{% endblock %}

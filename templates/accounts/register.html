@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-20 lg:py-28 bg-marplata-neutral min-h-[70vh]">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <span class="section-label mb-4 block">Crear cuenta</span>
+            <h1 class="font-heading text-4xl font-light tracking-tight-custom text-marplata-text">Registrarme</h1>
+        </div>
+
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="p-4 text-sm {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-emerald-50 text-emerald-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Correo electrónico</label>
+                <input type="email" name="email" value="{{ email }}" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" placeholder="tu@email.com">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Nombre</label>
+                    <input type="text" name="first_name" value="{{ first_name }}" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Apellido</label>
+                    <input type="text" name="last_name" value="{{ last_name }}" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Teléfono</label>
+                <input type="tel" name="phone" value="{{ phone }}" class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" placeholder="+57 300 000 0000">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Contraseña</label>
+                <input type="password" name="password" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" placeholder="••••••••">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Confirmar contraseña</label>
+                <input type="password" name="password_confirm" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" placeholder="••••••••">
+            </div>
+            <label class="flex items-start gap-3 text-sm text-marplata-text-light cursor-pointer">
+                <input type="checkbox" name="newsletter" {% if subscribe_newsletter %}checked{% else %}checked{% endif %} class="mt-1 w-4 h-4 accent-marplata-primary">
+                <span>Quiero recibir novedades y lanzamientos exclusivos de MARPLATA por correo electrónico.</span>
+            </label>
+            <button type="submit" class="w-full py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-wide-custom hover:bg-marplata-primary-dark transition-colors">
+                Crear cuenta
+            </button>
+        </form>
+
+        <p class="mt-8 text-center text-sm text-marplata-text-light">
+            ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}?next={{ next|urlencode }}" class="text-marplata-primary hover:underline">Inicia sesión</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

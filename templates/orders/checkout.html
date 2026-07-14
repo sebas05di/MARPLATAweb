@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Finalizar compra | MARPLATA{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-6xl">
+  <div class="text-center mb-12">
+    <p class="section-label mb-3">CHECKOUT</p>
+    <h1 class="font-heading text-3xl sm:text-4xl text-marplata-text mb-2">Finalizá tu compra</h1>
+    <p class="text-marplata-text-light text-sm">Revisá tu pedido y completá los datos de envío. Te confirmaremos por WhatsApp.</p>
+  </div>
+
+  <form method="post" action="{% url 'orders:checkout_whatsapp' %}" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    {% csrf_token %}
+
+    <div class="lg:col-span-2 space-y-6">
+      {% if not user.is_authenticated %}
+      <div class="bg-marplata-primary-soft border border-marplata-primary rounded-lg p-5 sm:p-6 flex flex-col sm:flex-row items-start gap-4">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-marplata-primary text-white flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-marplata-text font-medium mb-1">¿Querés crear una cuenta?</p>
+          <p class="text-xs text-marplata-text-light leading-relaxed mb-3">Es <strong class="font-semibold">opcional</strong>. Podés finalizar tu compra ahora como invitado. Si creás cuenta, vas a poder hacer seguimiento de tus pedidos y guardar tus favoritos.</p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="{% url 'accounts:login' %}?next={% url 'orders:checkout_form' %}" class="text-xs uppercase tracking-[0.2em] text-marplata-primary hover:text-marplata-primary-dark font-medium underline-offset-2 hover:underline">Iniciar sesión</a>
+            <span class="text-marplata-text-muted">·</span>
+            <a href="{% url 'accounts:register' %}?next={% url 'orders:checkout_form' %}" class="text-xs uppercase tracking-[0.2em] text-marplata-primary hover:text-marplata-primary-dark font-medium underline-offset-2 hover:underline">Crear cuenta</a>
+            <span class="text-marplata-text-muted">·</span>
+            <span class="text-xs text-marplata-text-muted italic">o continuá como invitado ↓</span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="bg-white border border-marplata-secondary rounded-lg p-6 sm:p-8">
+        <h2 class="font-heading text-xl text-marplata-text mb-6 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-full bg-marplata-primary text-white text-sm flex items-center justify-center">1</span>
+          Datos de contacto
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs tracking-widest text-marplata-text-light mb-2">NOMBRE COMPLETO *</label>
+            <input type="text" name="customer_name" required value="{{ user.first_name }} {{ user.last_name }}"
+                   class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+          </div>
+          <div>
+            <label class="block text-xs tracking-widest text-marplata-text-light mb-2">TELÉFONO / WHATSAPP *</label>
+            <input type="tel" name="customer_phone" required value="{{ user.phone|default:'' }}" placeholder="+57 300 123 4567"
+                   class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+          </div>
+          <div>
+            <label class="block text-xs tracking-widest text-marplata-text-light mb-2">CORREO *</label>
+            <input type="email" name="customer_email" required value="{{ user.email }}"
+                   class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-marplata-secondary rounded-lg p-6 sm:p-8">
+        <h2 class="font-heading text-xl text-marplata-text mb-6 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-full bg-marplata-primary text-white text-sm flex items-center justify-center">2</span>
+          Dirección de envío
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs tracking-widest text-marplata-text-light mb-2">DIRECCIÓN *</label>
+            <input type="text" name="shipping_address" required placeholder="Calle 123 #45-67"
+                   class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+          </div>
+          <div>
+            <label class="block text-xs tracking-widest text-marplata-text-light mb-2">CIUDAD *</label>
+            <input type="text" name="shipping_city" required placeholder="Bogotá"
+                   class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+          </div>
+          <div>
+            <label class="block text-xs tracking-widest text-marplata-text-light mb-2">DEPARTAMENTO *</label>
+            <input type="text" name="shipping_department" required placeholder="Cundinamarca"
+                   class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs tracking-widest text-marplata-text-light mb-2">INDICACIONES ADICIONALES</label>
+            <textarea name="shipping_notes" rows="2" placeholder="Edificio, apartamento, barrio, referencias..."
+                      class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-marplata-secondary rounded-lg p-6 sm:p-8">
+        <h2 class="font-heading text-xl text-marplata-text mb-6 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-full bg-marplata-primary text-white text-sm flex items-center justify-center">3</span>
+          Método de pago
+        </h2>
+        <div class="space-y-2">
+          {% for value, label in payment_methods %}
+          <label class="flex items-center gap-3 p-3 border border-marplata-secondary rounded cursor-pointer hover:border-marplata-primary has-[:checked]:border-marplata-primary has-[:checked]:bg-marplata-primary-soft transition">
+            <input type="radio" name="payment_method" value="{{ value }}" {% if forloop.first %}checked{% endif %} class="accent-marplata-primary">
+            <span class="text-sm text-marplata-text">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <p class="text-xs text-marplata-text-muted mt-4">Te confirmaremos los datos de pago por WhatsApp apenas confirmes el pedido.</p>
+      </div>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="bg-marplata-neutral border border-marplata-secondary rounded-lg p-6 sticky top-24">
+        <h2 class="font-heading text-lg text-marplata-text mb-4">Resumen del pedido</h2>
+        <div class="space-y-3 mb-4 max-h-80 overflow-y-auto">
+          {% for item in cart_data.items %}
+          <div class="flex gap-3 text-sm">
+            <div class="w-16 h-20 bg-marplata-secondary-light rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {% if item.image_url %}
+              <img src="{{ item.image_url }}" alt="{{ item.product_name }}" class="w-full h-full object-cover">
+              {% else %}
+              <span class="text-marplata-text-muted text-xs">IMG</span>
+              {% endif %}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-marplata-text font-medium leading-tight">{{ item.product_name }}</p>
+              <p class="text-marplata-text-muted text-xs">{{ item.color }} · {{ item.size }}</p>
+              <p class="text-marplata-text-light text-xs mt-1">{{ item.quantity }} × ${{ item.unit_price|intcomma }}</p>
+            </div>
+            <p class="text-marplata-text font-medium whitespace-nowrap">${{ item.subtotal|intcomma }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="border-t border-marplata-secondary pt-3 space-y-1 text-sm">
+          <div class="flex justify-between"><span class="text-marplata-text-light">Subtotal</span><span class="text-marplata-text">${{ cart_data.subtotal|intcomma }}</span></div>
+          {% if cart_data.discount %}
+          <div class="flex justify-between text-marplata-success"><span>Descuento{% if cart_data.coupon.code %} ({{ cart_data.coupon.code }}){% endif %}</span><span>-${{ cart_data.discount|intcomma }}</span></div>
+          {% endif %}
+          <div class="flex justify-between text-marplata-text-muted text-xs"><span>Envío</span><span>Se confirma por WhatsApp</span></div>
+        </div>
+        <div class="border-t border-marplata-secondary mt-3 pt-3 flex justify-between font-heading text-lg">
+          <span class="text-marplata-text">Total</span>
+          <span class="text-marplata-primary">${{ cart_data.total|intcomma }}</span>
+        </div>
+
+        <button type="submit" class="btn-primary w-full mt-6 py-4 text-sm tracking-widest">
+          {% if user.is_authenticated %}CONFIRMAR Y CONTACTAR POR WHATSAPP{% else %}FINALIZAR COMO INVITADO{% endif %}
+        </button>
+        <p class="text-xs text-marplata-text-muted text-center mt-3">Al confirmar serás redirigido a WhatsApp para finalizar tu pedido.</p>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

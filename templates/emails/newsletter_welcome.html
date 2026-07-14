@@ -1,0 +1,23 @@
+{% extends 'emails/base.html' %}
+{% block subject %}¡Suscripción confirmada!{% endblock %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-family:Georgia,serif;color:#2C3E50;font-size:28px;font-weight:400;">¡Suscripción confirmada!</h2>
+<p style="margin:0 0 24px;color:#6C7A89;font-size:15px;line-height:1.5;">Gracias por suscribirte al newsletter de {{ site_name }}. A partir de ahora vas a recibir en tu correo ({{ subscriber_email }}) nuestras novedades, lanzamientos y descuentos exclusivos.</p>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#EDF2FA;border-radius:6px;padding:24px;margin-bottom:24px;">
+  <tr><td>
+    <p style="margin:0 0 16px;color:#2C3E50;font-size:14px;line-height:1.6;">¿Qué vas a recibir?</p>
+    <p style="margin:0 0 8px;color:#6C7A89;font-size:14px;">👙 Lanzamientos de colecciones</p>
+    <p style="margin:0 0 8px;color:#6C7A89;font-size:14px;">🎁 Descuentos exclusivos para suscriptoras</p>
+    <p style="margin:0 0 8px;color:#6C7A89;font-size:14px;">📸 Detrás de cámaras y novedades</p>
+    <p style="margin:0;color:#6C7A89;font-size:14px;">💌 Tips de estilo y cuidado de tus prendas</p>
+  </td></tr>
+</table>
+
+<p style="margin:0 0 24px;text-align:center;">
+  <a href="{{ site_url }}/coleccion/" style="display:inline-block;background-color:{{ primary_color }};color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:4px;font-size:14px;letter-spacing:1px;">DESCUBRIR COLECCIÓN</a>
+</p>
+
+<p style="margin:24px 0 0;color:#95A5A6;font-size:12px;line-height:1.5;">Si no deseás recibir más correos, podés desuscribirte en cualquier momento desde tu cuenta o respondiendo este email.</p>
+{% endblock %}

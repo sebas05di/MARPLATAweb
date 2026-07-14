@@ -1,0 +1,7 @@
+-r base.txt
+gunicorn>=21.0
+django-cloudinary-storage>=0.3
+cloudinary>=1.36
+dj-database-url>=2.0
+django-anymail[sendgrid]>=10.0
+sentry-sdk[django]>=2.0

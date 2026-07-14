@@ -1,0 +1,271 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if page_meta_title %}
+    <title>{{ page_meta_title }} | MARPLATA</title>
+    {% elif page_title %}
+    <title>{{ page_title }} | MARPLATA</title>
+    {% else %}
+    <title>MARPLATA — Diseña tu estilo, resalta tu esencia</title>
+    {% endif %}
+    {% if page_meta_description %}
+    <meta name="description" content="{{ page_meta_description }}">
+    {% endif %}
+    <meta name="theme-color" content="#6B8BC8">
+    <meta property="og:site_name" content="{{ site_config.site_name|default:'MARPLATA' }}">
+    <meta property="og:title" content="{% if page_meta_title %}{{ page_meta_title }}{% else %}MARPLATA — Diseña tu estilo, resalta tu esencia{% endif %} | MARPLATA">
+    <meta property="og:description" content="{% if page_meta_description %}{{ page_meta_description }}{% else %}{{ site_config.site_tagline|default:'Diseña tu estilo, resalta tu esencia' }}{% endif %}">
+    <meta property="og:type" content="{% if request.resolver_match.url_name == 'product_detail' %}product{% else %}website{% endif %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% if og_image %}{{ og_image }}{% else %}{{ default_og_image }}{% endif %}">
+    <meta property="og:locale" content="es_CO">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% if page_meta_title %}{{ page_meta_title }}{% else %}MARPLATA{% endif %}">
+    <meta name="twitter:description" content="{% if page_meta_description %}{{ page_meta_description }}{% else %}{{ site_config.site_tagline|default:'Diseña tu estilo, resalta tu esencia' }}{% endif %}">
+    <meta name="twitter:image" content="{% if og_image %}{{ og_image }}{% else %}{{ default_og_image }}{% endif %}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicons/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicons/favicon-16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicons/favicon-32x32.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicons/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=garet@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/marplata.css' %}?v=3">
+    {% csrf_token %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="{% block navbar_class %}sticky top-0 z-50 bg-marplata-neutral/95 backdrop-blur-md border-b border-marplata-secondary-light{% endblock %}">
+        {% if not user.is_authenticated %}
+        <!-- Announcement ticker -->
+        <div class="bg-marplata-primary text-white text-xs sm:text-sm uppercase tracking-[0.2em] py-2.5 overflow-hidden" data-ticker>
+            <div class="flex whitespace-nowrap" data-ticker-track>
+                {% for _ in "123456789012" %}
+                <span class="flex-shrink-0 px-8 sm:px-12">
+                    Regístrate y obtené <strong class="font-bold">10% de descuento</strong> en tu primera compra
+                    <a href="{% url 'accounts:register' %}" class="font-bold underline underline-offset-4 hover:text-white/80 ml-2">Crear cuenta →</a>
+                </span>
+                {% endfor %}
+                {% for _ in "123456789012" %}
+                <span class="flex-shrink-0 px-8 sm:px-12" aria-hidden="true">
+                    Regístrate y obtené <strong class="font-bold">10% de descuento</strong> en tu primera compra
+                    <a href="{% url 'accounts:register' %}" class="font-bold underline underline-offset-4 hover:text-white/80 ml-2">Crear cuenta →</a>
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 lg:h-20">
+                <!-- Mobile menu button -->
+                <button id="navToggle" class="lg:hidden p-2 -ml-2 {% block navbar_icon_color %}text-marplata-text{% endblock %}" aria-label="Abrir menú">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+
+                <!-- Logo (texto con tipografía Garet oficial de la marca) -->
+                <a href="{% url 'home' %}" class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:mr-12">
+                    {% block navbar_logo %}<span class="font-heading text-2xl lg:text-3xl font-light tracking-[0.25em] text-marplata-text">MARPLATA</span>{% endblock %}
+                </a>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center gap-10 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
+                    <a href="{% url 'catalog:product_list' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_color %}text-marplata-text{% endblock %} link-underline">Colecciones</a>
+                    <a href="{% url 'catalog:product_list' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_muted_color %}text-marplata-text-light{% endblock %} link-underline">Nuevo</a>
+                    <a href="{% url 'page_detail' 'nosotros' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_muted_color_2 %}text-marplata-text-light{% endblock %} link-underline">Nosotros</a>
+                </div>
+
+                <!-- Right icons -->
+                <div class="flex items-center gap-4">
+                    <button type="button" id="searchToggle" class="hidden sm:block p-2 {% block navbar_icon_color_2 %}text-marplata-text{% endblock %} hover:text-marplata-primary transition-colors" aria-label="Buscar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                    </button>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:profile' %}" class="p-2 text-marplata-text hover:text-marplata-primary transition-colors" aria-label="Mi perfil">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="p-2 text-marplata-text hover:text-marplata-primary transition-colors" aria-label="Mi cuenta">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'cart:cart_detail' %}" class="relative p-2 {% block navbar_icon_color_4 %}text-marplata-text{% endblock %} hover:text-marplata-primary transition-colors" aria-label="Carrito">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                        <span id="cartCount" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-marplata-primary text-white text-[10px] font-semibold rounded-full px-1">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Backdrop -->
+        <div id="navBackdrop" class="fixed inset-0 bg-marplata-text/30 backdrop-blur-sm z-30 hidden lg:hidden transition-opacity duration-300 opacity-0"></div>
+
+        <!-- Mobile Menu -->
+        <div id="navMenu" class="fixed inset-0 z-40 flex flex-col justify-between px-6 py-6 bg-marplata-text/85 backdrop-blur-md text-white transition-all duration-300 opacity-0 pointer-events-none lg:hidden overflow-y-auto overscroll-contain">
+            <div>
+                <div class="flex justify-end mb-8">
+                    <button type="button" id="navClose" class="p-2 text-white" aria-label="Cerrar menú">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <a href="{% url 'catalog:product_list' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Colecciones</a>
+                    <a href="{% url 'catalog:product_list' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Nuevo</a>
+                    <a href="{% url 'page_detail' 'nosotros' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Nosotros</a>
+                    <a href="{% url 'page_detail' 'contacto' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Contacto</a>
+                </div>
+            </div>
+            <div class="border-t border-white/20 pt-6 mt-6">
+                <div class="flex flex-col gap-3">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:profile' %}" class="block py-2 text-base font-medium text-white/80 hover:text-white transition-colors">Mi perfil</a>
+                    <a href="{% url 'accounts:wishlist' %}" class="block py-2 text-base font-medium text-white/80 hover:text-white transition-colors">Favoritos</a>
+                    <a href="{% url 'cart:cart_detail' %}" class="block py-2 text-base font-medium text-white/80 hover:text-white transition-colors">Carrito</a>
+                    <a href="{% url 'accounts:logout' %}" class="block py-2 text-base font-medium text-white/80 hover:text-white transition-colors">Cerrar sesión</a>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="block py-2 text-base font-medium text-white/80 hover:text-white transition-colors">Iniciar sesión</a>
+                    <a href="{% url 'accounts:register' %}" class="block py-2 text-base font-medium text-white/80 hover:text-white transition-colors">Registrarme</a>
+                    <a href="{% url 'cart:cart_detail' %}" class="block py-2 text-base font-medium text-white/80 hover:text-white transition-colors">Carrito</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-marplata-text text-white">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+            {% if not user.is_authenticated %}
+            <div class="pb-12 lg:pb-16 border-b border-white/10 mb-12 lg:mb-16">
+                <div class="max-w-xl mx-auto text-center">
+                    <h3 class="font-heading text-2xl lg:text-3xl font-light tracking-tight-custom mb-3">Únete a MARPLATA</h3>
+                    <p class="text-white/60 text-sm mb-6">Regístrate para recibir lanzamientos exclusivos y completar tu compra más fácil.</p>
+                    <form id="footerRegisterForm" class="space-y-4">
+                        <input type="email" name="email" placeholder="Correo electrónico" required class="w-full px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
+                        <div id="registerExtraFields" class="hidden grid-cols-2 gap-4">
+                            <input type="text" name="first_name" placeholder="Nombre" class="col-span-2 sm:col-span-1 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
+                            <input type="text" name="last_name" placeholder="Apellido" class="col-span-2 sm:col-span-1 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
+                            <input type="tel" name="phone" placeholder="Teléfono" class="col-span-2 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
+                            <input type="password" name="password" placeholder="Contraseña" class="col-span-2 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
+                        </div>
+                        <button type="submit" class="w-full py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-[0.2em] hover:bg-marplata-primary-dark transition-colors">
+                            Registrarme
+                        </button>
+                    </form>
+                    <p class="mt-4 text-xs text-white/40">¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}" class="text-white/70 hover:text-white underline">Inicia sesión</a></p>
+                </div>
+            </div>
+            {% else %}
+            <div class="pb-12 lg:pb-16 border-b border-white/10 mb-12 lg:mb-16">
+                <div class="max-w-xl mx-auto text-center">
+                    <h3 class="font-heading text-2xl lg:text-3xl font-light tracking-tight-custom mb-3">¿Quieres novedades exclusivas?</h3>
+                    <p class="text-white/60 text-sm mb-6">Suscríbete a nuestro newsletter y entérate primero de nuevos lanzamientos y promociones.</p>
+                    <form id="footerNewsletterForm" class="flex flex-col sm:flex-row gap-3">
+                        <input type="email" name="email" placeholder="tu@email.com" required class="flex-1 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
+                        <button type="submit" class="px-8 py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-[0.2em] hover:bg-marplata-primary-dark transition-colors">
+                            Suscribirme
+                        </button>
+                    </form>
+                    <p id="newsletterMessage" class="mt-4 text-xs hidden"></p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-8">
+                <div class="col-span-2 md:col-span-3 lg:col-span-1 text-center lg:text-left mb-4 lg:mb-0">
+                    <span class="font-heading text-3xl font-light tracking-[0.25em] text-white">MARPLATA</span>
+                    <p class="mt-4 text-sm text-white/60 leading-relaxed max-w-xs mx-auto lg:mx-0">Diseña tu estilo, resalta tu esencia. Vestidos de baño pensados para cada cuerpo y cada historia.</p>
+                </div>
+                <div>
+                    <h4 class="text-xs font-normal uppercase tracking-[0.2em] text-white/50 mb-6">Navegación</h4>
+                    <ul class="space-y-3">
+                        <li><a href="{% url 'catalog:product_list' %}" class="text-sm text-white/70 hover:text-white transition-colors">Colecciones</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}" class="text-sm text-white/70 hover:text-white transition-colors">Nuevo</a></li>
+                        {% for page in footer_pages.navegacion %}
+                        <li><a href="{% url 'page_detail' page.slug %}" class="text-sm text-white/70 hover:text-white transition-colors">{{ page.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-normal uppercase tracking-[0.2em] text-white/50 mb-6">Legal</h4>
+                    <ul class="space-y-3">
+                        {% for page in footer_pages.legal %}
+                        <li><a href="{% url 'page_detail' page.slug %}" class="text-sm text-white/70 hover:text-white transition-colors">{{ page.title }}</a></li>
+                        {% endfor %}
+                        {% if not footer_pages.legal %}
+                        <li class="text-xs text-white/40">Sin páginas configuradas</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-normal uppercase tracking-[0.2em] text-white/50 mb-6">Ayuda</h4>
+                    <ul class="space-y-3">
+                        {% for page in footer_pages.ayuda %}
+                        <li><a href="{% url 'page_detail' page.slug %}" class="text-sm text-white/70 hover:text-white transition-colors">{{ page.title }}</a></li>
+                        {% endfor %}
+                        {% if site_config.contact_email %}
+                        <li><a href="mailto:{{ site_config.contact_email }}" class="text-sm text-white/70 hover:text-white transition-colors">Escríbenos</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-normal uppercase tracking-[0.2em] text-white/50 mb-6">Síguenos</h4>
+                    <ul class="space-y-3">
+                        {% if site_config.instagram_url %}
+                        <li><a href="{{ site_config.instagram_url }}" target="_blank" rel="noopener" class="text-sm text-white/70 hover:text-white transition-colors">Instagram</a></li>
+                        {% endif %}
+                        {% if site_config.facebook_url %}
+                        <li><a href="{{ site_config.facebook_url }}" target="_blank" rel="noopener" class="text-sm text-white/70 hover:text-white transition-colors">Facebook</a></li>
+                        {% endif %}
+                        {% if site_config.tiktok_url %}
+                        <li><a href="{{ site_config.tiktok_url }}" target="_blank" rel="noopener" class="text-sm text-white/70 hover:text-white transition-colors">TikTok</a></li>
+                        {% endif %}
+                        {% if site_config.pinterest_url %}
+                        <li><a href="{{ site_config.pinterest_url }}" target="_blank" rel="noopener" class="text-sm text-white/70 hover:text-white transition-colors">Pinterest</a></li>
+                        {% endif %}
+                        {% if site_config.contact_email %}
+                        <li><a href="mailto:{{ site_config.contact_email }}" class="text-sm text-white/70 hover:text-white transition-colors">{{ site_config.contact_email }}</a></li>
+                        {% endif %}
+                        {% if site_config.whatsapp_number %}
+                        <li><a href="https://wa.me/{{ site_config.whatsapp_number|cut:'+'|cut:' '|cut:'-' }}" target="_blank" rel="noopener" class="text-sm text-white/70 hover:text-white transition-colors">WhatsApp</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/10">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <p class="text-xs text-white/40 text-center">&copy; {% now "Y" %} MARPLATA. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Search overlay -->
+    <div id="searchOverlay" class="fixed inset-0 z-[100] hidden">
+        <div id="searchBackdrop" class="absolute inset-0 bg-marplata-text/60 backdrop-blur-sm"></div>
+        <div class="relative max-w-2xl mx-auto mt-24 px-4 animate-fade-in-up">
+            <form action="{% url 'catalog:search' %}" method="get" class="relative">
+                <input type="search" id="searchInput" name="q" placeholder="Buscar productos..." autocomplete="off" class="w-full px-6 py-5 pr-14 bg-white text-marplata-text text-lg shadow-strong focus:outline-none" autofocus>
+                <button type="button" id="searchClose" class="absolute right-4 top-1/2 -translate-y-1/2 text-marplata-text-muted hover:text-marplata-text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </form>
+            <div id="searchSuggestions" class="hidden mt-2 bg-white shadow-strong max-h-96 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+    <script src="{% static 'js/ticker.js' %}" defer></script>
+</body>
+</html>

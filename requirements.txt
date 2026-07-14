@@ -1,0 +1,20 @@
+Django==4.2.30
+django-jazzmin==3.0.4
+psycopg2-binary==2.9.12
+python-dotenv==1.2.2
+Pillow==12.2.0
+
+# Deployment
+dj-database-url==2.2.0
+whitenoise==6.7.0
+gunicorn==22.0.0
+
+# Media storage (Cloudinary) - opcional
+django-cloudinary-storage==0.3.0
+cloudinary==1.41.0
+
+# Email (API backend para producción)
+django-anymail[sendgrid]==12.0
+
+# Error tracking (opcional)
+sentry-sdk[django]>=2.0

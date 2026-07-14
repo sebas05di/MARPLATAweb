@@ -1,0 +1,40 @@
+{% load humanize %}<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block subject %}{{ site_name }}{% endblock %}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F5EFEB;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#2C3E50;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#F5EFEB;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+          <tr>
+            <td style="background-color:{{ primary_color }};padding:32px 24px;text-align:center;">
+              <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;color:#ffffff;font-size:32px;letter-spacing:4px;font-weight:400;">{{ site_name }}</h1>
+              <p style="margin:8px 0 0;color:#EDF2FA;font-size:13px;letter-spacing:1px;">{{ site_tagline }}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px 32px;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#F5EFEB;padding:24px 32px;text-align:center;border-top:1px solid #E8E0D8;">
+              <p style="margin:0 0 8px;color:#6C7A89;font-size:13px;font-family:Georgia,serif;">{{ site_name }} · {{ site_tagline }}</p>
+              {% if contact_email %}<p style="margin:4px 0;color:#95A5A6;font-size:12px;">{{ contact_email }}{% if contact_phone %} · {{ contact_phone }}{% endif %}</p>{% endif %}
+              <p style="margin:12px 0 0;color:#95A5A6;font-size:11px;">
+                <a href="{{ site_url }}" style="color:#95A5A6;text-decoration:underline;">Visitar sitio</a>
+                ·
+                <a href="{{ site_url }}/pagina/politica-privacidad/" style="color:#95A5A6;text-decoration:underline;">Privacidad</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

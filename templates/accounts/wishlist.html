@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-16 lg:py-24 bg-marplata-neutral min-h-[60vh]">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-12">
+            <div>
+                <span class="section-label mb-4 block">Mi cuenta</span>
+                <h1 class="font-heading text-4xl lg:text-5xl font-light tracking-tight-custom text-marplata-text">Mis favoritos</h1>
+            </div>
+            <a href="{% url 'accounts:profile' %}" class="text-xs uppercase tracking-wide-custom text-marplata-text-muted hover:text-marplata-primary">← Volver al perfil</a>
+        </div>
+
+        {% if items %}
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 lg:gap-x-8 lg:gap-y-14">
+            {% for item in items %}
+            <div class="group">
+                <div class="relative aspect-[3/4] overflow-hidden bg-marplata-secondary-light mb-5">
+                    <a href="{% url 'product_detail' item.product.slug %}">
+                        {% if item.product.primary_image %}
+                        <img src="{{ item.product.primary_image.url }}" alt="{{ item.product.name }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        {% else %}
+                        <div class="absolute inset-0 image-placeholder"></div>
+                        {% endif %}
+                    </a>
+                    <button type="button" class="wishlist-toggle absolute top-3 right-3 w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm text-marplata-danger hover:bg-white transition-colors shadow-soft" data-product-id="{{ item.product.id }}" data-in-wishlist="true" aria-label="Quitar de favoritos">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                    </button>
+                </div>
+                <div class="text-center">
+                    {% if item.product.collection %}
+                    <p class="text-xs uppercase tracking-wide-custom text-marplata-text-muted mb-2">{{ item.product.collection.name }}</p>
+                    {% endif %}
+                    <h3 class="text-base lg:text-lg font-normal text-marplata-text mb-2 group-hover:text-marplata-primary transition-colors">
+                        <a href="{% url 'product_detail' item.product.slug %}">{{ item.product.name }}</a>
+                    </h3>
+                    <p class="text-sm text-marplata-text-light">${{ item.product.base_price|floatformat:0 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-20 bg-white shadow-soft">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-marplata-text-muted mb-6"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+            <h2 class="font-heading text-2xl text-marplata-text mb-3">Aún no tienes favoritos</h2>
+            <p class="text-marplata-text-light mb-8 max-w-xs mx-auto">Guardá los productos que te gusten para encontrarlos fácilmente después.</p>
+            <a href="{% url 'catalog:product_list' %}" class="btn-primary">Explorar colección</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/wishlist.js' %}"></script>
+{% endblock %}

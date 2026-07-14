@@ -1,0 +1,39 @@
+{% extends 'emails/base.html' %}
+{% block subject %}Tu pedido está {{ new_status_label }}{% endblock %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-family:Georgia,serif;color:#2C3E50;font-size:24px;font-weight:400;">Hola {{ order.customer_name }},</h2>
+<p style="margin:0 0 24px;color:#6C7A89;font-size:15px;line-height:1.5;">Tu pedido <strong>#{{ order.order_number }}</strong> acaba de cambiar de estado.</p>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#EDF2FA;border-radius:6px;padding:24px;margin-bottom:24px;text-align:center;">
+  <tr><td>
+    <p style="margin:0 0 8px;color:#6C7A89;font-size:12px;letter-spacing:2px;">NUEVO ESTADO</p>
+    <p style="margin:0;font-family:Georgia,serif;color:{{ primary_color }};font-size:28px;font-weight:400;">{{ new_status_label }}</p>
+  </td></tr>
+</table>
+
+{% if order.tracking_number %}
+<h3 style="margin:0 0 12px;font-family:Georgia,serif;color:#2C3E50;font-size:18px;font-weight:400;">Código de seguimiento</h3>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#F5EFEB;border-radius:6px;padding:16px;margin-bottom:24px;">
+  <tr><td>
+    <p style="margin:0;color:#2C3E50;font-size:18px;letter-spacing:2px;font-family:monospace;"><strong>{{ order.tracking_number }}</strong></p>
+    {% if order.tracking_url %}<p style="margin:8px 0 0;"><a href="{{ order.tracking_url }}" style="color:{{ primary_color }};text-decoration:underline;">Ver rastreo en línea →</a></p>{% endif %}
+  </td></tr>
+</table>
+{% endif %}
+
+{% if order.status == 'dispatched' %}
+<p style="margin:0 0 16px;color:#6C7A89;font-size:14px;line-height:1.5;">📦 Tu pedido fue despachado. Pronto llegará a la dirección que nos indicaste.</p>
+{% elif order.status == 'delivered' %}
+<p style="margin:0 0 16px;color:#6C7A89;font-size:14px;line-height:1.5;">✅ Tu pedido fue entregado. ¡Gracias por tu compra!</p>
+{% elif order.status == 'cancelled' %}
+<p style="margin:0 0 16px;color:#6C7A89;font-size:14px;line-height:1.5;">❌ Tu pedido fue cancelado. Si tenés alguna duda, contactanos.</p>
+{% elif order.status == 'confirmed' %}
+<p style="margin:0 0 16px;color:#6C7A89;font-size:14px;line-height:1.5;">✅ Confirmamos tu pedido. Te avisaremos cuando sea despachado.</p>
+{% elif order.status == 'contacted' %}
+<p style="margin:0 0 16px;color:#6C7A89;font-size:14px;line-height:1.5;">📞 Te contactamos por WhatsApp para confirmar el pedido y los datos de envío.</p>
+{% endif %}
+
+<p style="margin:24px 0 0;color:#6C7A89;font-size:14px;line-height:1.5;">Si tenés alguna duda, podés responder este correo o escribirnos por WhatsApp.</p>
+<p style="margin:24px 0 0;font-family:Georgia,serif;color:#2C3E50;font-size:16px;">Con cariño,<br><strong style="color:{{ primary_color }};">Equipo {{ site_name }}</strong></p>
+{% endblock %}

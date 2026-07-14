@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Rastrear mi pedido | MARPLATA{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-xl">
+  <div class="text-center mb-8">
+    <p class="section-label mb-3">RASTREO DE PEDIDO</p>
+    <h1 class="font-heading text-3xl text-marplata-text mb-2">¿Dónde está mi pedido?</h1>
+    <p class="text-marplata-text-light text-sm">Ingresá el número de pedido y el correo que usaste al comprar.</p>
+  </div>
+
+  <form method="post" class="bg-white border border-marplata-secondary rounded-lg p-6 sm:p-8">
+    {% csrf_token %}
+    {% if error %}
+    <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
+      {{ error }}
+    </div>
+    {% endif %}
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs tracking-widest text-marplata-text-light mb-2">NÚMERO DE PEDIDO</label>
+        <input type="text" name="order_number" required placeholder="Ej: 20260622-ABC12345"
+               class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+      </div>
+      <div>
+        <label class="block text-xs tracking-widest text-marplata-text-light mb-2">CORREO DE LA COMPRA</label>
+        <input type="email" name="email" required placeholder="tu@correo.com"
+               class="w-full px-4 py-3 border border-marplata-secondary rounded focus:border-marplata-primary focus:outline-none text-sm">
+      </div>
+    </div>
+    <button type="submit" class="btn-primary w-full mt-6 py-4 text-sm">RASTREAR PEDIDO</button>
+  </form>
+
+  <p class="text-center text-xs text-marplata-text-muted mt-6">
+    ¿Ya tenés cuenta? <a href="{% url 'accounts:login' %}?next=/cuenta/perfil/" class="text-marplata-primary hover:underline">Iniciá sesión</a> para ver todos tus pedidos.
+  </p>
+</div>
+{% endblock %}

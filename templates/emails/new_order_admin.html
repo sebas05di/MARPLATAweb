@@ -1,0 +1,71 @@
+{% extends 'emails/base.html' %}
+{% load humanize %}
+{% block subject %}Nuevo pedido {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-family:Georgia,serif;color:#2C3E50;font-size:24px;font-weight:400;">Nuevo pedido recibido</h2>
+<p style="margin:0 0 24px;color:#6C7A89;font-size:15px;line-height:1.5;">Se ha creado un nuevo pedido en {{ site_name }}.</p>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#EDF2FA;border-radius:6px;padding:16px;margin-bottom:24px;">
+  <tr><td>
+    <p style="margin:0;color:#6C7A89;font-size:12px;letter-spacing:1px;">PEDIDO</p>
+    <p style="margin:4px 0 0;color:#2C3E50;font-size:20px;font-weight:600;">#{{ order.order_number }}</p>
+    <p style="margin:8px 0 0;color:#6C7A89;font-size:13px;">{{ order.created_at|date:"d/m/Y H:i" }} · {{ order.get_payment_method_display }}</p>
+  </td></tr>
+</table>
+
+<h3 style="margin:0 0 12px;font-family:Georgia,serif;color:#2C3E50;font-size:18px;font-weight:400;">Cliente</h3>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#F5EFEB;border-radius:6px;padding:16px;margin-bottom:24px;">
+  <tr><td>
+    <p style="margin:0 0 4px;color:#2C3E50;font-size:14px;"><strong>{{ order.customer_name }}</strong></p>
+    <p style="margin:0 0 4px;color:#6C7A89;font-size:13px;">📞 {{ order.customer_phone }}</p>
+    <p style="margin:0;color:#6C7A89;font-size:13px;">✉️ {{ order.customer_email }}</p>
+    <p style="margin:12px 0 0;color:#6C7A89;font-size:13px;">📍 {{ order.shipping_address }}{% if order.shipping_city %}, {{ order.shipping_city }}{% endif %}{% if order.shipping_department %} · {{ order.shipping_department }}{% endif %}</p>
+    {% if order.shipping_notes %}<p style="margin:8px 0 0;color:#E74C3C;font-size:12px;"><strong>Nota:</strong> {{ order.shipping_notes }}</p>{% endif %}
+  </td></tr>
+</table>
+
+<h3 style="margin:0 0 12px;font-family:Georgia,serif;color:#2C3E50;font-size:18px;font-weight:400;">Productos</h3>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin-bottom:16px;">
+  <thead>
+    <tr style="border-bottom:2px solid #E8E0D8;">
+      <th align="left" style="padding:8px 0;color:#6C7A89;font-size:11px;letter-spacing:1px;">PRODUCTO</th>
+      <th align="center" style="padding:8px 0;color:#6C7A89;font-size:11px;letter-spacing:1px;">CANT.</th>
+      <th align="right" style="padding:8px 0;color:#6C7A89;font-size:11px;letter-spacing:1px;">SUBTOTAL</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr style="border-bottom:1px solid #F5EFEB;">
+      <td style="padding:10px 0;color:#2C3E50;font-size:13px;vertical-align:top;">
+        {{ item.variant.product.name }}<br>
+        <span style="color:#95A5A6;font-size:11px;">{{ item.variant.color.name }}{% if item.variant.size %} · {{ item.variant.size }}{% endif %}</span>
+      </td>
+      <td align="center" style="padding:10px 0;color:#2C3E50;font-size:13px;">{{ item.quantity }}</td>
+      <td align="right" style="padding:10px 0;color:#2C3E50;font-size:13px;">${{ item.subtotal|intcomma }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:24px;">
+  {% if order.discount_amount %}
+  <tr>
+    <td align="right" style="padding:4px 0;color:#27AE60;font-size:13px;">Descuento{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}:</td>
+    <td align="right" width="120" style="padding:4px 0 4px 16px;color:#27AE60;font-size:13px;">-${{ order.discount_amount|intcomma }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td align="right" style="padding:4px 0;color:#6C7A89;font-size:13px;">Envío:</td>
+    <td align="right" style="padding:4px 0 4px 16px;color:#2C3E50;font-size:13px;">{{ order.shipping_cost|default:0|floatformat:0|intcomma }}</td>
+  </tr>
+  <tr style="border-top:2px solid #E8E0D8;">
+    <td align="right" style="padding:12px 0 0;font-family:Georgia,serif;color:#2C3E50;font-size:16px;"><strong>Total:</strong></td>
+    <td align="right" style="padding:12px 0 0 16px;font-family:Georgia,serif;color:#6B8BC8;font-size:18px;"><strong>${{ order.total_amount|intcomma }}</strong></td>
+  </tr>
+</table>
+
+<p style="margin:0;text-align:center;">
+  <a href="{{ site_url }}/admin/orders/whatsapporder/{{ order.id }}/change/" style="display:inline-block;background-color:{{ primary_color }};color:#ffffff;text-decoration:none;padding:12px 32px;border-radius:4px;font-size:14px;letter-spacing:1px;">VER EN EL ADMIN</a>
+</p>
+{% endblock %}

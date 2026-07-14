@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-16 lg:py-24 bg-marplata-neutral min-h-[60vh]">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 lg:mb-16">
+            <span class="section-label mb-4 block">Carrito</span>
+            <h1 class="font-heading text-4xl lg:text-5xl font-light tracking-tight-custom text-marplata-text">Tu selección</h1>
+        </div>
+
+        {% if items %}
+        <div class="grid lg:grid-cols-3 gap-10 lg:gap-16">
+            <!-- Items -->
+            <div class="lg:col-span-2 space-y-6">
+                {% for item in items %}
+                <div class="flex gap-5 pb-6 border-b border-marplata-secondary-light cart-item" data-variant-id="{{ item.variant_id }}">
+                    <div class="w-24 h-32 lg:w-32 lg:h-40 flex-shrink-0 overflow-hidden bg-marplata-secondary-light">
+                        {% if item.image_url %}
+                        <img src="{{ item.image_url }}" alt="{{ item.product_name }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full image-placeholder"></div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-4">
+                            <div>
+                                <a href="{% url 'product_detail' item.product_slug %}" class="font-heading text-lg lg:text-xl text-marplata-text hover:text-marplata-primary transition-colors">{{ item.product_name }}</a>
+                                <p class="text-sm text-marplata-text-muted mt-1">{{ item.color }} / {{ item.size }}</p>
+                                <p class="text-sm text-marplata-text-light mt-1">${{ item.unit_price|floatformat:0 }}</p>
+                            </div>
+                            <button class="cart-item__remove p-1 text-marplata-text-muted hover:text-marplata-danger transition-colors" data-variant-id="{{ item.variant_id }}" aria-label="Eliminar del carrito">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="inline-flex items-center border border-marplata-secondary-light">
+                                <button class="cart-item__qty-btn--minus w-9 h-9 flex items-center justify-center text-marplata-text-light hover:bg-marplata-neutral transition-colors" data-variant-id="{{ item.variant_id }}" aria-label="Reducir cantidad">−</button>
+                                <input type="number" class="cart-item__qty-input w-11 h-9 text-center text-sm text-marplata-text border-x border-marplata-secondary-light focus:outline-none" value="{{ item.quantity }}" min="1" max="{{ item.stock }}" data-variant-id="{{ item.variant_id }}">
+                                <button class="cart-item__qty-btn--plus w-9 h-9 flex items-center justify-center text-marplata-text-light hover:bg-marplata-neutral transition-colors" data-variant-id="{{ item.variant_id }}" aria-label="Aumentar cantidad">+</button>
+                            </div>
+                            <span class="cart-item__subtotal-value text-base font-medium text-marplata-text" data-variant-id="{{ item.variant_id }}">${{ item.subtotal|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg p-6 lg:p-8 shadow-soft lg:sticky lg:top-28">
+                    <h3 class="font-heading text-2xl text-marplata-text mb-6">Resumen</h3>
+
+                    <!-- Coupon -->
+                    <div class="mb-6 pb-6 border-b border-marplata-secondary-light">
+                        {% if coupon %}
+                        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-4 py-3" id="couponBadge">
+                            <div>
+                                <p class="text-xs uppercase tracking-wide-custom text-emerald-700 font-normal">Cupón aplicado</p>
+                                <p class="text-sm font-medium text-emerald-800 mt-0.5">{{ coupon.code }} · {{ coupon.name }}</p>
+                            </div>
+                            <button type="button" id="couponRemove" class="text-xs text-emerald-700 hover:text-emerald-900 underline">Quitar</button>
+                        </div>
+                        {% else %}
+                        <label class="block text-xs font-normal uppercase tracking-wide-custom text-marplata-text-muted mb-2">Código de descuento</label>
+                        <form id="couponForm" class="flex gap-2">
+                            <input type="text" name="code" placeholder="VERANO20" class="flex-1 px-4 py-3 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors uppercase">
+                            <button type="submit" class="px-5 py-3 bg-marplata-text text-white text-xs font-normal uppercase tracking-wide-custom hover:bg-marplata-text-light transition-colors">Aplicar</button>
+                        </form>
+                        <p id="couponMessage" class="mt-2 text-xs hidden"></p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex justify-between items-center py-3 text-sm text-marplata-text-light">
+                        <span>Subtotal ({{ total_items }} {{ total_items|pluralize:"ítem,ítems" }})</span>
+                        <span id="cartSubtotal" class="font-medium text-marplata-text">${{ subtotal|floatformat:0 }}</span>
+                    </div>
+                    {% if discount %}
+                    <div class="flex justify-between items-center py-3 text-sm text-emerald-700">
+                        <span>Descuento</span>
+                        <span id="cartDiscount" class="font-medium">-${% if coupon.discount_type == 'percentage' %}{{ coupon.discount_value|floatformat:0 }}% (-${{ discount|floatformat:0 }}){% else %}${{ discount|floatformat:0 }}{% endif %}</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex justify-between items-center py-3 text-sm text-marplata-text-light border-b border-marplata-secondary-light">
+                        <span>Envío</span>
+                        <span>Por WhatsApp</span>
+                    </div>
+                    <div class="flex justify-between items-center py-5 text-lg font-medium text-marplata-text">
+                        <span>Total</span>
+                        <span id="cartTotalFinal">${{ total|floatformat:0 }}</span>
+                    </div>
+                    <a href="{% url 'orders:checkout_form' %}" id="checkoutBtn" class="w-full block text-center py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-wide-custom hover:bg-marplata-primary-dark transition-colors">
+                        Finalizar pedido por WhatsApp
+                    </a>
+                    <p class="mt-4 text-xs text-marplata-text-muted text-center leading-relaxed">Al finalizar se creará tu pedido y serás redirigido a WhatsApp para confirmar con un vendedor. Podés comprar como invitado.</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-marplata-text-muted mb-6"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <h2 class="font-heading text-2xl text-marplata-text mb-3">Tu carrito está vacío</h2>
+            <p class="text-marplata-text-light mb-8 max-w-xs mx-auto">Explora nuestra colección y encuentra tu vestido de baño ideal.</p>
+            <a href="{% url 'catalog:product_list' %}" class="btn-primary">Ver colección</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart.js' %}"></script>
+{% endblock %}

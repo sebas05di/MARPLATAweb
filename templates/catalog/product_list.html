@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-16 lg:py-24 bg-marplata-neutral">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12 lg:mb-16">
+            <span class="section-label mb-4 block">Catálogo</span>
+            <h1 class="font-heading text-4xl lg:text-6xl font-light tracking-tight-custom mb-4 text-marplata-text">
+                {% if collection %}{{ collection.name }}{% else %}Toda la colección{% endif %}
+            </h1>
+            <p class="text-marplata-text-light font-light max-w-xl mx-auto">
+                Descubre piezas diseñadas para realzar tu esencia en cada momento junto al mar.
+            </p>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap items-center justify-center gap-3 mb-14 lg:mb-20">
+            <a href="{% url 'catalog:product_list' %}" class="px-5 py-2.5 text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 {% if not collection %}bg-marplata-primary text-white{% else %}bg-white text-marplata-text border border-marplata-secondary-light hover:border-marplata-primary{% endif %}">
+                Todas
+            </a>
+            {% for col in collections %}
+            <a href="{% url 'catalog:product_list_by_collection' col.slug %}" class="px-5 py-2.5 text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 {% if collection.slug == col.slug %}bg-marplata-primary text-white{% else %}bg-white text-marplata-text border border-marplata-secondary-light hover:border-marplata-primary{% endif %}">
+                {{ col.name }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Product Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 lg:gap-x-8 lg:gap-y-14">
+            {% for product in products %}
+            <div class="group relative">
+                <a href="{% url 'product_detail' product.slug %}" class="block">
+                    <div class="relative aspect-[3/4] overflow-hidden bg-marplata-secondary-light mb-5">
+                        {% if product.primary_image %}
+                        <img src="{{ product.primary_image.url }}" alt="{{ product.name }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        {% else %}
+                        <div class="absolute inset-0 image-placeholder"></div>
+                        {% endif %}
+                        {% if product.available_stock == 0 %}
+                        <span class="absolute top-3 left-3 px-3 py-1 text-[10px] font-normal uppercase tracking-wide-custom bg-marplata-primary text-white">Agotado</span>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                        <button type="button" class="wishlist-toggle absolute top-3 right-3 w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur-sm hover:bg-white transition-colors shadow-soft {% if product.id|stringformat:'s' in user_wishlist_ids %}text-marplata-danger{% else %}text-marplata-text-muted hover:text-marplata-danger{% endif %} opacity-0 group-hover:opacity-100" data-product-id="{{ product.id }}" data-in-wishlist="{% if product.id|stringformat:'s' in user_wishlist_ids %}true{% else %}false{% endif %}" aria-label="Favorito">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="{% if product.id|stringformat:'s' in user_wishlist_ids %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                        </button>
+                        {% endif %}
+                        <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                            <span class="w-full block py-3 bg-white/95 backdrop-blur-sm text-center text-xs font-normal uppercase tracking-wide-custom text-marplata-text">Ver producto</span>
+                        </div>
+                    </div>
+                </a>
+                <div class="text-center">
+                    {% if product.collection %}
+                    <p class="text-xs uppercase tracking-wide-custom text-marplata-text-muted mb-2">{{ product.collection.name }}</p>
+                    {% endif %}
+                    <h3 class="text-base lg:text-lg font-normal text-marplata-text mb-2 group-hover:text-marplata-primary transition-colors">
+                        <a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a>
+                    </h3>
+                    <p class="text-sm text-marplata-text-light">${{ product.base_price|floatformat:0 }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-20">
+                <p class="text-marplata-text-light mb-6">No hay productos disponibles en esta colección.</p>
+                <a href="{% url 'catalog:product_list' %}" class="btn-primary">Ver todos los productos</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

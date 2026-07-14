@@ -1,0 +1,263 @@
+{% extends 'admin/base_site.html' %}
+{% load humanize %}
+
+{% block title %}{{ title }} | {{ site_title }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  .db-grid { display: grid; gap: 1.25rem; }
+  .db-metric { background: #fff; padding: 1.25rem 1.5rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,.04); border-left: 4px solid var(--primary); }
+  .db-metric .label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; margin-bottom: 4px; }
+  .db-metric .value { font-size: 28px; font-weight: 600; color: #2c3e50; line-height: 1.1; }
+  .db-metric .sublabel { font-size: 12px; color: #95a5a6; margin-top: 4px; }
+  .db-card { background: #fff; padding: 1.5rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,.04); margin-bottom: 1.25rem; }
+  .db-card h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; margin: 0 0 1rem 0; }
+  .db-status { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 11px; text-transform: uppercase; font-weight: 600; }
+  .s-pending { background: #fef3cd; color: #856404; }
+  .s-contacted { background: #d1ecf1; color: #0c5460; }
+  .s-confirmed { background: #d4edda; color: #155724; }
+  .s-dispatched { background: #EDF2FA; color: #6B8BC8; }
+  .s-delivered { background: #c3e6cb; color: #155724; }
+  .s-cancelled { background: #f8d7da; color: #721c24; }
+  .db-warn { color: #e74c3c; font-weight: 600; }
+  .db-alert { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 16px; border-radius: 4px; margin-bottom: 1.25rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="db-grid">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:.5rem;">
+    <h1 style="font-size:24px;font-weight:400;margin:0;">📊 Dashboard</h1>
+    <div style="font-size:12px;color:#6c757d;">Actualizado: {% now "d/m/Y H:i" %}</div>
+  </div>
+
+  {% if low_stock_count or out_of_stock_count %}
+  <div class="db-alert">
+    <strong>⚠️ Atención:</strong>
+    {% if out_of_stock_count %}<a href="/admin/catalog/productvariant/?stock__exact=0" class="db-warn">{{ out_of_stock_count }} variante(s) agotada(s)</a>{% endif %}
+    {% if out_of_stock_count and low_stock_count %}, {% endif %}
+    {% if low_stock_count %}<a href="/admin/catalog/productvariant/?o=2" class="db-warn">{{ low_stock_count }} con stock bajo</a>{% endif %}
+  </div>
+  {% endif %}
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem;">
+    <div class="db-metric">
+      <div class="label">Pedidos hoy</div>
+      <div class="value">{{ metrics.orders_7|default:0 }}</div>
+      <div class="sublabel">últimos 7 días</div>
+    </div>
+    <div class="db-metric" style="border-left-color:#27AE60;">
+      <div class="label">Ingresos últimos 30 días</div>
+      <div class="value">${{ metrics.revenue_30|floatformat:0|intcomma }}</div>
+      <div class="sublabel">{{ metrics.orders_30|default:0 }} pedidos</div>
+    </div>
+    <div class="db-metric" style="border-left-color:#5A7BB5;">
+      <div class="label">Ingresos del mes</div>
+      <div class="value">${{ metrics.revenue_month|floatformat:0|intcomma }}</div>
+      <div class="sublabel">{{ metrics.orders_month|default:0 }} pedidos</div>
+    </div>
+    <div class="db-metric" style="border-left-color:#C8D8E6;">
+      <div class="label">Ticket promedio (30d)</div>
+      <div class="value">${{ metrics.avg_ticket_30|floatformat:0|intcomma }}</div>
+      <div class="sublabel">por pedido</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+    <div class="db-metric" style="border-left-color:#f0ad4e;">
+      <div class="label">Pendientes</div>
+      <div class="value"><a href="/admin/orders/whatsapporder/?status__exact=pending" style="color:inherit;">{{ metrics.status_pending|default:0 }}</a></div>
+    </div>
+    <div class="db-metric" style="border-left-color:#5bc0de;">
+      <div class="label">Contactados</div>
+      <div class="value"><a href="/admin/orders/whatsapporder/?status__exact=contacted" style="color:inherit;">{{ metrics.status_contacted|default:0 }}</a></div>
+    </div>
+    <div class="db-metric" style="border-left-color:#5cb85c;">
+      <div class="label">Confirmados</div>
+      <div class="value"><a href="/admin/orders/whatsapporder/?status__exact=confirmed" style="color:inherit;">{{ metrics.status_confirmed|default:0 }}</a></div>
+    </div>
+    <div class="db-metric" style="border-left-color:#6B8BC8;">
+      <div class="label">Despachados</div>
+      <div class="value"><a href="/admin/orders/whatsapporder/?status__exact=dispatched" style="color:inherit;">{{ metrics.status_dispatched|default:0 }}</a></div>
+    </div>
+    <div class="db-metric" style="border-left-color:#1e7e34;">
+      <div class="label">Entregados</div>
+      <div class="value"><a href="/admin/orders/whatsapporder/?status__exact=delivered" style="color:inherit;">{{ metrics.status_delivered|default:0 }}</a></div>
+    </div>
+    <div class="db-metric" style="border-left-color:#d9534f;">
+      <div class="label">Cancelados</div>
+      <div class="value"><a href="/admin/orders/whatsapporder/?status__exact=cancelled" style="color:inherit;">{{ metrics.status_cancelled|default:0 }}</a></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.25rem;">
+    <div class="db-card">
+      <h2>📈 Ventas últimos 30 días</h2>
+      {% if sales_by_day_values %}
+      <canvas id="salesByDayChart" height="120"></canvas>
+      {% else %}
+      <p style="color:#95a5a6;font-size:14px;">Sin datos aún</p>
+      {% endif %}
+    </div>
+    <div class="db-card">
+      <h2>📊 Ventas por mes</h2>
+      {% if sales_by_month_values %}
+      <canvas id="salesByMonthChart" height="120"></canvas>
+      {% else %}
+      <p style="color:#95a5a6;font-size:14px;">Sin datos aún</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.25rem;">
+    <div class="db-card">
+      <h2>🏆 Top productos (últimos 30 días)</h2>
+      {% if top_products %}
+      <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:2px solid #f5efeb;">
+            <th style="text-align:left;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">PRODUCTO</th>
+            <th style="text-align:center;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">CANT.</th>
+            <th style="text-align:right;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">INGRESOS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in top_products %}
+          <tr style="border-bottom:1px solid #f5efeb;">
+            <td style="padding:8px 0;color:#2c3e50;">{{ p.product_name_snapshot }}</td>
+            <td style="text-align:center;padding:8px 0;color:#6c7a89;">{{ p.qty }}</td>
+            <td style="text-align:right;padding:8px 0;color:#6B8BC8;font-weight:600;">${{ p.revenue|floatformat:0|intcomma }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p style="color:#95a5a6;font-size:14px;">Sin ventas registradas en los últimos 30 días.</p>
+      {% endif %}
+    </div>
+
+    <div class="db-card">
+      <h2>📦 Pedidos recientes</h2>
+      {% if recent_orders %}
+      <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:2px solid #f5efeb;">
+            <th style="text-align:left;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">PEDIDO</th>
+            <th style="text-align:left;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">CLIENTE</th>
+            <th style="text-align:center;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">ESTADO</th>
+            <th style="text-align:right;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in recent_orders %}
+          <tr style="border-bottom:1px solid #f5efeb;">
+            <td style="padding:8px 0;"><a href="/admin/orders/whatsapporder/{{ order.id }}/change/" style="color:#6B8BC8;">{{ order.order_number }}</a></td>
+            <td style="padding:8px 0;color:#2c3e50;">{{ order.customer_name|truncatewords:3 }}</td>
+            <td style="text-align:center;padding:8px 0;"><span class="db-status s-{{ order.status }}">{{ order.get_status_display }}</span></td>
+            <td style="text-align:right;padding:8px 0;color:#2c3e50;">${{ order.total_amount|floatformat:0|intcomma }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p style="color:#95a5a6;font-size:14px;">No hay pedidos aún.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if low_stock %}
+  <div class="db-card">
+    <h2>⚠️ Stock bajo</h2>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:2px solid #f5efeb;">
+          <th style="text-align:left;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">PRODUCTO</th>
+          <th style="text-align:left;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">VARIANTE</th>
+          <th style="text-align:right;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">STOCK</th>
+          <th style="text-align:right;padding:8px 0;color:#6c757d;font-size:11px;letter-spacing:.05em;">UMBRAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in low_stock %}
+        <tr style="border-bottom:1px solid #f5efeb;">
+          <td style="padding:8px 0;"><a href="/admin/catalog/product/{{ v.product.id }}/change/" style="color:#6B8BC8;">{{ v.product.name }}</a></td>
+          <td style="padding:8px 0;color:#6c7a89;">{{ v.color.name }}{% if v.size %} · {{ v.size }}{% endif %}</td>
+          <td style="text-align:right;padding:8px 0;" class="{% if v.stock == 0 %}db-warn{% else %}db-warn{% endif %}"><strong>{{ v.stock }}</strong></td>
+          <td style="text-align:right;padding:8px 0;color:#95a5a6;">{{ v.low_stock_threshold }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% if sales_by_day_values %}
+<script>
+  const PRIMARY = '#6B8BC8';
+  const PRIMARY_DARK = '#5A7BB5';
+  Chart.defaults.font.family = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+  Chart.defaults.color = '#6c7a89';
+
+  new Chart(document.getElementById('salesByDayChart'), {
+    type: 'line',
+    data: {
+      labels: {{ sales_by_day_labels|safe }},
+      datasets: [{
+        label: 'Ingresos',
+        data: {{ sales_by_day_values|safe }},
+        borderColor: PRIMARY,
+        backgroundColor: 'rgba(107,139,200,0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 3,
+        pointBackgroundColor: PRIMARY_DARK,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { callback: v => '$' + v.toLocaleString('es-CO') }
+        }
+      }
+    }
+  });
+</script>
+{% endif %}
+{% if sales_by_month_values %}
+<script>
+  new Chart(document.getElementById('salesByMonthChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ sales_by_month_labels|safe }},
+      datasets: [{
+        label: 'Ingresos',
+        data: {{ sales_by_month_values|safe }},
+        backgroundColor: PRIMARY,
+        borderColor: PRIMARY_DARK,
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { callback: v => '$' + v.toLocaleString('es-CO') }
+        }
+      }
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

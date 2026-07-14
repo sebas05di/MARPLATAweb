@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-20 lg:py-28 bg-marplata-neutral min-h-[60vh]">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <h1 class="font-heading text-4xl font-light tracking-tight-custom text-marplata-text mb-4">¡Pedido recibido!</h1>
+        {% if order %}
+        <p class="text-marplata-text-light mb-2">Tu orden <span class="font-medium text-marplata-text">{{ order.order_number }}</span> fue creada exitosamente.</p>
+        <p class="text-marplata-text-light mb-8">Si no fuiste redirigido a WhatsApp, contacta a nuestro equipo con tu número de orden.</p>
+        <a href="{% url 'home' %}" class="btn-primary">Volver al inicio</a>
+        {% else %}
+        <p class="text-marplata-text-light mb-8">Tu pedido fue procesado. Pronto nos pondremos en contacto contigo.</p>
+        <a href="{% url 'home' %}" class="btn-primary">Volver al inicio</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-16 lg:py-24 bg-marplata-neutral min-h-[70vh]">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <span class="section-label mb-4 block">Mi cuenta</span>
+            <h1 class="font-heading text-4xl font-light tracking-tight-custom text-marplata-text">Perfil</h1>
+        </div>
+
+        <!-- Profile form -->
+        <div class="bg-white p-6 lg:p-10 shadow-soft mb-10">
+            <h2 class="font-heading text-2xl text-marplata-text mb-6">Información personal</h2>
+
+            {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                <div class="p-4 text-sm {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-emerald-50 text-emerald-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Correo electrónico</label>
+                    <input type="email" value="{{ user.email }}" disabled class="w-full px-5 py-4 bg-marplata-secondary-light/40 border border-marplata-secondary-light text-marplata-text-muted text-sm focus:outline-none cursor-not-allowed">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Nombre</label>
+                        <input type="text" name="first_name" value="{{ user.first_name }}" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Apellido</label>
+                        <input type="text" name="last_name" value="{{ user.last_name }}" required class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide-custom text-marplata-text-muted mb-2">Teléfono</label>
+                    <input type="tel" name="phone" value="{{ user.phone }}" class="w-full px-5 py-4 bg-white border border-marplata-secondary-light text-marplata-text text-sm focus:outline-none focus:border-marplata-primary transition-colors" placeholder="+57 300 000 0000">
+                </div>
+                <label class="flex items-start gap-3 text-sm text-marplata-text-light cursor-pointer">
+                    <input type="checkbox" name="newsletter" {% if is_subscribed %}checked{% endif %} class="mt-1 w-4 h-4 accent-marplata-primary">
+                    <span>{% if is_subscribed %}Suscripción activa al newsletter.{% else %}Quiero recibir novedades y lanzamientos exclusivos de MARPLATA por correo electrónico.{% endif %}</span>
+                </label>
+                <button type="submit" class="w-full py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-wide-custom hover:bg-marplata-primary-dark transition-colors">
+                    Guardar cambios
+                </button>
+            </form>
+        </div>
+
+        <!-- Order History -->
+        <div>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="font-heading text-2xl text-marplata-text">Mis pedidos</h2>
+                <span class="text-xs text-marplata-text-muted uppercase tracking-wide-custom">{{ orders|length }} {{ orders|length|pluralize:"pedido,pedidos" }}</span>
+            </div>
+
+            {% if orders %}
+            <div class="space-y-4">
+                {% for order in orders %}
+                <div class="bg-white shadow-soft">
+                    <button type="button" class="order-toggle w-full text-left p-5 lg:p-6 flex flex-wrap items-center justify-between gap-4" data-order-id="{{ order.id }}">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs text-marplata-text-muted uppercase tracking-wide-custom mb-1">{{ order.created_at|date:"d M Y" }}</p>
+                            <p class="font-medium text-marplata-text">{{ order.order_number }}</p>
+                        </div>
+                        <div class="flex items-center gap-3 lg:gap-5">
+                            <span class="px-3 py-1 text-[10px] font-semibold uppercase rounded-full {{ order.status_color_class }}">{{ order.get_status_display }}</span>
+                            <span class="font-medium text-marplata-text text-sm lg:text-base">${{ order.total_amount|floatformat:0 }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="order-chevron text-marplata-text-muted transition-transform duration-300 flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                    </button>
+                    <div class="order-items hidden border-t border-marplata-secondary-light" data-order-id="{{ order.id }}">
+                        <div class="p-5 lg:p-6 space-y-3">
+                            {% for item in order.items.all %}
+                            <div class="flex justify-between items-start text-sm gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-marplata-text">{{ item.product_name_snapshot }}</p>
+                                    <p class="text-xs text-marplata-text-muted mt-0.5">{{ item.variant_snapshot }} · Cant. {{ item.quantity }}</p>
+                                </div>
+                                <span class="text-marplata-text-light whitespace-nowrap">${{ item.subtotal|floatformat:0 }}</span>
+                            </div>
+                            {% endfor %}
+                            <div class="pt-3 mt-3 border-t border-marplata-secondary-light flex justify-between text-sm font-medium">
+                                <span class="text-marplata-text">Total</span>
+                                <span class="text-marplata-text">${{ order.total_amount|floatformat:0 }}</span>
+                            </div>
+                            <div class="pt-3 flex justify-end">
+                                <a href="{% url 'orders:order_tracking' order.order_number %}" class="text-xs text-marplata-primary hover:underline uppercase tracking-wide-custom">Ver detalle / tracking →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-16 bg-white shadow-soft">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-marplata-text-muted mb-4"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                <p class="text-marplata-text-light mb-6">Aún no has realizado pedidos.</p>
+                <a href="{% url 'catalog:product_list' %}" class="btn-primary">Ver colección</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick links -->
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs uppercase tracking-wide-custom">
+            <a href="{% url 'accounts:wishlist' %}" class="text-marplata-text-muted hover:text-marplata-primary transition-colors">Mis favoritos</a>
+            <a href="{% url 'accounts:logout' %}" class="text-marplata-text-muted hover:text-marplata-primary transition-colors">Cerrar sesión</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  var toggles = document.querySelectorAll('.order-toggle');
+  toggles.forEach(function (toggle) {
+    toggle.addEventListener('click', function () {
+      var orderId = this.getAttribute('data-order-id');
+      var items = document.querySelector('.order-items[data-order-id="' + orderId + '"]');
+      var chevron = this.querySelector('.order-chevron');
+      if (items) {
+        items.classList.toggle('hidden');
+        if (chevron) chevron.classList.toggle('rotate-180');
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

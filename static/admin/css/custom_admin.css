@@ -1,0 +1,114 @@
+/* ============================================
+   MARPLATA Admin Custom Theme
+   Colores: #6B8BC8 (primary), #C8D8E6 (secondary), #F5EFEB (neutral)
+   Tipografía: fuente del sistema (NO TAN MON CHERRY)
+   ============================================ */
+
+:root {
+  --marplata-primary: #6B8BC8;
+  --marplata-secondary: #C8D8E6;
+  --marplata-neutral: #F5EFEB;
+  --marplata-text: #2C3E50;
+}
+
+/* Navbar (top bar) */
+.main-header.navbar {
+  background-color: var(--marplata-primary) !important;
+  border-bottom: none !important;
+}
+
+.main-header .navbar-nav .nav-link,
+.main-header .navbar-nav .dropdown-toggle {
+  color: #FFFFFF !important;
+}
+
+.main-header .navbar-nav .nav-link:hover {
+  color: var(--marplata-neutral) !important;
+}
+
+/* Brand / Logo area */
+.brand-link {
+  background-color: var(--marplata-primary) !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+}
+
+/* Sidebar */
+.main-sidebar {
+  background-color: var(--marplata-neutral) !important;
+}
+
+.nav-sidebar .nav-item > .nav-link {
+  color: var(--marplata-text) !important;
+}
+
+.nav-sidebar .nav-item > .nav-link.active {
+  background-color: var(--marplata-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.nav-sidebar .nav-item > .nav-link:hover {
+  background-color: var(--marplata-secondary) !important;
+  color: var(--marplata-text) !important;
+}
+
+/* Sidebar submenu */
+.nav-treeview > .nav-item > .nav-link {
+  color: #5a6c7d !important;
+}
+
+.nav-treeview > .nav-item > .nav-link.active {
+  background-color: var(--marplata-secondary) !important;
+  color: var(--marplata-text) !important;
+}
+
+/* Content wrapper */
+.content-wrapper {
+  background-color: #FFFFFF;
+}
+
+/* Cards / boxes */
+.card {
+  border-top: 3px solid var(--marplata-primary);
+}
+
+/* Buttons primary */
+.btn-primary {
+  background-color: var(--marplata-primary) !important;
+  border-color: var(--marplata-primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: #5579b8 !important;
+  border-color: #5579b8 !important;
+}
+
+/* Links */
+a {
+  color: var(--marplata-primary);
+}
+
+a:hover {
+  color: #5579b8;
+}
+
+/* Welcome sign */
+.login-box-msg {
+  color: var(--marplata-text);
+}
+
+/* Breadcrumb */
+.breadcrumb-item.active {
+  color: var(--marplata-primary);
+}
+
+/* Table headers */
+.table thead th {
+  border-bottom: 2px solid var(--marplata-primary);
+}
+
+/* Pagination */
+.page-item.active .page-link {
+  background-color: var(--marplata-primary) !important;
+  border-color: var(--marplata-primary) !important;
+}
