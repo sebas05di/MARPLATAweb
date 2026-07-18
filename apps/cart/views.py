@@ -45,7 +45,9 @@ def get_cart_items(request):
                 'product_name': variant.product.name,
                 'product_slug': variant.product.slug,
                 'color': variant.color,
-                'size': variant.size,
+                'top_size': variant.top_size,
+                'bottom_size': variant.bottom_size,
+                'size': f"Top {variant.top_size} / Tanga {variant.bottom_size}",
                 'quantity': quantity,
                 'unit_price': float(unit_price),
                 'subtotal': float(item_subtotal),
@@ -138,7 +140,7 @@ def cart_add(request):
 
     return JsonResponse({
         'success': True,
-        'message': f'{variant.product.name} ({variant.color} / {variant.size}) added to cart',
+        'message': f"{variant.product.name} ({variant.color} / Top {variant.top_size} / Tanga {variant.bottom_size}) added to cart",
         'total_items': cart_data['total_items'],
         'subtotal': cart_data['subtotal'],
         'discount': cart_data['discount'],

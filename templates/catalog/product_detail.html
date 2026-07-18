@@ -48,7 +48,10 @@
 
                 <h1 class="font-heading text-4xl lg:text-5xl xl:text-6xl font-light tracking-tight-custom text-marplata-text mb-4">{{ product.name }}</h1>
 
-                <p id="productPrice" class="text-2xl lg:text-3xl font-light text-marplata-text mb-8">${{ product.base_price|floatformat:0 }}</p>
+                <p id="productPrice" class="text-2xl lg:text-3xl font-light text-marplata-text mb-2">${{ product.base_price|floatformat:0 }}</p>
+                {% if product.top_price and product.bottom_price %}
+                <p class="text-sm text-marplata-text-muted mb-8">Top ${{ product.top_price|floatformat:0 }} + Tanga ${{ product.bottom_price|floatformat:0 }}</p>
+                {% endif %}
 
                 <!-- Variants -->
                 <div class="border-t border-marplata-secondary-light pt-8">
@@ -58,13 +61,22 @@
                         <div id="colorOptions" class="flex flex-wrap gap-3"></div>
                     </div>
 
-                    <!-- Size -->
+                    <!-- Top Size -->
                     <div class="mb-6">
                         <div class="flex items-baseline justify-between mb-3">
-                            <label class="section-label block">Talla</label>
+                            <label class="section-label block">Talla top</label>
                             <a href="#sizeGuide" class="text-xs text-marplata-text-muted hover:text-marplata-primary transition-colors underline-offset-2 hover:underline">Guía de tallas</a>
                         </div>
-                        <div id="sizeOptions" class="flex flex-wrap gap-3"></div>
+                        <div id="topSizeOptions" class="flex flex-wrap gap-3"></div>
+                    </div>
+
+                    <!-- Bottom Size -->
+                    <div class="mb-6">
+                        <div class="flex items-baseline justify-between mb-3">
+                            <label class="section-label block">Talla tanga</label>
+                            <a href="#sizeGuide" class="text-xs text-marplata-text-muted hover:text-marplata-primary transition-colors underline-offset-2 hover:underline">Guía de tallas</a>
+                        </div>
+                        <div id="bottomSizeOptions" class="flex flex-wrap gap-3"></div>
                     </div>
 
                     <!-- Cantidad -->
@@ -228,7 +240,8 @@ window.productData = {
             "id": "{{ variant.id }}",
             "color": "{{ variant.color|escapejs }}",
             "color_slug": "{{ variant.color_slug|escapejs }}",
-            "size": "{{ variant.size|escapejs }}",
+            "top_size": "{{ variant.top_size|escapejs }}",
+            "bottom_size": "{{ variant.bottom_size|escapejs }}",
             "stock": {{ variant.stock }},
             "price_override": {% if variant.price_override %}{{ variant.price_override }}{% else %}null{% endif %},
             "images": [
@@ -245,7 +258,7 @@ window.productData = {
     "basePrice": {{ product.base_price|floatformat:0 }}
 };
 </script>
-<script src="{% static 'js/product-detail.js' %}"></script>
+<script src="{% static 'js/product-detail.js' %}?v=2"></script>
 <script src="{% static 'js/quantity-selector.js' %}"></script>
 {% if user.is_authenticated %}
 <script src="{% static 'js/wishlist.js' %}"></script>

@@ -75,8 +75,9 @@ def checkout_whatsapp(request):
                 if not variant:
                     raise ValueError(f"Variant {item['variant_id']} no longer exists")
                 if variant.stock < item['quantity']:
+                    size_label = f"Top {item.get('top_size', item.get('size'))} / Tanga {item.get('bottom_size', item.get('size'))}"
                     raise ValueError(
-                        f"Stock insuficiente para {item['product_name']} ({item['color']} / {item['size']}). "
+                        f"Stock insuficiente para {item['product_name']} ({item['color']} / {size_label}). "
                         f"Stock disponible: {variant.stock}"
                     )
 
@@ -97,11 +98,12 @@ def checkout_whatsapp(request):
 
             for item in cart_data['items']:
                 variant = variants[item['variant_id']]
+                size_label = f"Top {item.get('top_size', item.get('size'))} / Tanga {item.get('bottom_size', item.get('size'))}"
                 WhatsAppOrderItem.objects.create(
                     order=order,
                     variant=variant,
                     product_name_snapshot=item['product_name'],
-                    variant_snapshot=f"{item['color']} / {item['size']}",
+                    variant_snapshot=f"{item['color']} / {size_label}",
                     quantity=item['quantity'],
                     unit_price=item['unit_price'],
                 )

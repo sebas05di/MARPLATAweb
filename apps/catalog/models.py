@@ -36,7 +36,18 @@ class Product(models.Model):
     story = models.TextField(_('historia'), blank=True)
     materials = models.CharField(_('materiales'), max_length=200, blank=True)
     base_price = models.DecimalField(
-        _('precio base'), max_digits=10, decimal_places=2
+        _('precio total'), max_digits=10, decimal_places=2,
+        help_text=_('Precio de venta. Si completás precio top y tanga, se calcula automáticamente.')
+    )
+    top_price = models.DecimalField(
+        _('precio top'), max_digits=10, decimal_places=2,
+        null=True, blank=True,
+        help_text=_('Precio de la parte superior del vestido de baño.')
+    )
+    bottom_price = models.DecimalField(
+        _('precio tanga'), max_digits=10, decimal_places=2,
+        null=True, blank=True,
+        help_text=_('Precio de la parte inferior del vestido de baño.')
     )
     cover_image = models.ImageField(
         _('imagen de portada'),
@@ -72,6 +83,8 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        if self.top_price is not None and self.bottom_price is not None:
+            self.base_price = self.top_price + self.bottom_price
         super().save(*args, **kwargs)
 
     @property
@@ -107,7 +120,8 @@ class ProductVariant(models.Model):
         ('M', 'M'),
         ('L', 'L'),
     ]
-    size = models.CharField(_('talla'), max_length=4, choices=SIZE_CHOICES)
+    top_size = models.CharField(_('talla top'), max_length=4, choices=SIZE_CHOICES)
+    bottom_size = models.CharField(_('talla tanga'), max_length=4, choices=SIZE_CHOICES)
     sku = models.CharField(_('SKU'), max_length=50, unique=True)
     stock = models.PositiveIntegerField(_('stock'), default=0)
     low_stock_threshold = models.PositiveIntegerField(
@@ -129,11 +143,11 @@ class ProductVariant(models.Model):
     class Meta:
         verbose_name = _('variante de producto')
         verbose_name_plural = _('variantes de producto')
-        unique_together = [['product', 'color_slug', 'size']]
-        ordering = ['product', 'color', 'size']
+        unique_together = [['product', 'color_slug', 'top_size', 'bottom_size']]
+        ordering = ['product', 'color', 'top_size', 'bottom_size']
 
     def __str__(self):
-        return f"{self.product.name} — {self.color} / {self.size}"
+        return f"{self.product.name} — {self.color} / Top {self.top_size} / Tanga {self.bottom_size}"
 
     def save(self, *args, **kwargs):
         if not self.color_slug:

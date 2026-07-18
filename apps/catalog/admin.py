@@ -41,8 +41,8 @@ class VariantImageInline(admin.TabularInline):
 
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
-    list_display = ['product', 'color', 'size', 'sku', 'stock_badge', 'low_stock_threshold', 'final_price', 'is_active']
-    list_filter = ['is_active', 'color', 'size', 'product__collection', StockLevelFilter]
+    list_display = ['product', 'color', 'top_size', 'bottom_size', 'sku', 'stock_badge', 'low_stock_threshold', 'final_price', 'is_active']
+    list_filter = ['is_active', 'color', 'top_size', 'bottom_size', 'product__collection', StockLevelFilter]
     search_fields = ['sku', 'product__name', 'color']
     list_editable = ['low_stock_threshold']
     actions = ['mark_active', 'mark_inactive']
@@ -78,19 +78,19 @@ class ProductVariantAdmin(admin.ModelAdmin):
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
-    fields = ['color', 'color_slug', 'size', 'sku', 'stock', 'low_stock_threshold', 'price_override', 'is_active']
+    fields = ['color', 'color_slug', 'top_size', 'bottom_size', 'sku', 'stock', 'low_stock_threshold', 'price_override', 'is_active']
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'collection', 'base_price', 'total_stock', 'is_active', 'created_at']
+    list_display = ['name', 'slug', 'collection', 'base_price', 'top_price', 'bottom_price', 'total_stock', 'is_active', 'created_at']
     list_filter = ['is_active', 'collection']
     search_fields = ['name', 'description', 'story', 'materials']
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductVariantInline]
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'collection', 'description', 'story', 'materials', 'base_price', 'is_active')
+            'fields': ('name', 'slug', 'collection', 'description', 'story', 'materials', 'top_price', 'bottom_price', 'base_price', 'is_active')
         }),
         ('Imagen y SEO', {
             'fields': ('cover_image', 'meta_title', 'meta_description'),

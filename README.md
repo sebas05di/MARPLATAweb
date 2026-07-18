@@ -73,6 +73,7 @@ MARPLATA/
 │   ├── js/                        # JavaScript
 │   ├── img/
 │   │   ├── hero/                  # Imágenes del hero
+│   │   ├── products/              # Fotos fuente de productos
 │   │   ├── branding/              # og:image y favicons
 │   │   └── favicons/              # Favicon multi-resolución
 │   └── site.webmanifest           # PWA manifest
@@ -121,6 +122,7 @@ MARPLATA/
 |---------|-----|
 | `python manage.py migrate` | Aplicar migraciones |
 | `python manage.py seed_pages` | Cargar/actualizar páginas estáticas |
+| `python manage.py seed_products` | Cargar/actualizar productos desde `static/img/products/` |
 | `python manage.py collectstatic --noinput` | Recopilar estáticos para prod |
 | `python manage.py createsuperuser` | Crear admin |
 | `python manage.py test_cloudinary` | Verificar configuración de Cloudinary |

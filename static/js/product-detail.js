@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var selectedColor = null;
-  var selectedSize = null;
+  var selectedTopSize = null;
+  var selectedBottomSize = null;
   var currentImages = [];
   var currentImageIndex = 0;
 
@@ -18,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
   var zoomLens = document.getElementById('zoomLens');
   var thumbnailContainer = document.getElementById('thumbnailContainer');
   var colorOptionsContainer = document.getElementById('colorOptions');
-  var sizeOptionsContainer = document.getElementById('sizeOptions');
+  var topSizeOptionsContainer = document.getElementById('topSizeOptions');
+  var bottomSizeOptionsContainer = document.getElementById('bottomSizeOptions');
   var productPrice = document.getElementById('productPrice');
   var stockStatus = document.querySelector('.product-detail__stock-status');
   var addToCartBtn = document.getElementById('addToCartBtn');
@@ -33,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
   var lightboxNextBtn = document.getElementById('lightboxNextBtn');
 
-  if (!mainImage || !colorOptionsContainer || !sizeOptionsContainer || !addToCartBtn) {
+  if (!mainImage || !colorOptionsContainer || !topSizeOptionsContainer || !bottomSizeOptionsContainer || !addToCartBtn) {
     console.error('[MARPLATA] Required DOM elements missing');
     return;
   }
@@ -69,16 +71,50 @@ document.addEventListener('DOMContentLoaded', function () {
     return colors;
   }
 
-  function getSizesForColor(colorSlug) {
-    return variants
-      .filter(function (v) { return v.color_slug === colorSlug; })
-      .map(function (v) { return v.size; });
+  function sortSizes(sizes) {
+    var order = { S: 1, M: 2, L: 3 };
+    return sizes.slice().sort(function (a, b) {
+      return (order[a] || 99) - (order[b] || 99);
+    });
   }
 
-  function getVariant(colorSlug, size) {
+  function getTopSizesForColor(colorSlug) {
+    var seen = new Set();
+    var sizes = variants
+      .filter(function (v) { return v.color_slug === colorSlug; })
+      .map(function (v) { return v.top_size; })
+      .filter(function (s) { if (seen.has(s)) return false; seen.add(s); return true; });
+    return sortSizes(sizes);
+  }
+
+  function getBottomSizesForColor(colorSlug) {
+    var seen = new Set();
+    var sizes = variants
+      .filter(function (v) { return v.color_slug === colorSlug; })
+      .map(function (v) { return v.bottom_size; })
+      .filter(function (s) { if (seen.has(s)) return false; seen.add(s); return true; });
+    return sortSizes(sizes);
+  }
+
+  function getVariant(colorSlug, topSize, bottomSize) {
     return variants.find(function (v) {
-      return v.color_slug === colorSlug && v.size === size;
+      return v.color_slug === colorSlug && v.top_size === topSize && v.bottom_size === bottomSize;
     });
+  }
+
+  function getImagesForColor(colorSlug) {
+    var colorVariants = variants.filter(function (v) { return v.color_slug === colorSlug; });
+    var images = [];
+    var seen = new Set();
+    colorVariants.forEach(function (v) {
+      (v.images || []).forEach(function (img) {
+        if (!seen.has(img.url)) {
+          seen.add(img.url);
+          images.push(img);
+        }
+      });
+    });
+    return images;
   }
 
   function getFallbackImage() {
@@ -163,25 +199,24 @@ document.addEventListener('DOMContentLoaded', function () {
     return map[colorSlug] || '#C8D8E6';
   }
 
-  function renderSizes() {
-    sizeOptionsContainer.innerHTML = '';
+  function renderSizeOptions(container, sizes, selectedSize, prefix) {
+    container.innerHTML = '';
     if (!selectedColor) return;
 
-    var sizes = getSizesForColor(selectedColor);
     if (sizes.length === 0) {
-      sizeOptionsContainer.innerHTML = '<span class="text-sm text-marplata-muted">No hay tallas disponibles</span>';
+      container.innerHTML = '<span class="text-sm text-marplata-muted">No hay tallas disponibles</span>';
       return;
     }
 
     sizes.forEach(function (size) {
-      var variant = getVariant(selectedColor, size);
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'min-w-[52px] h-12 px-4 border border-marplata-secondary text-sm font-medium text-marplata-text transition-all duration-300 hover:border-marplata-primary focus:outline-none';
       btn.textContent = size;
       btn.setAttribute('data-size', size);
-      btn.setAttribute('aria-label', 'Talla ' + size);
+      btn.setAttribute('aria-label', prefix + ' ' + size);
 
+      var variant = getVariant(selectedColor, prefix === 'Top' ? size : selectedTopSize, prefix === 'Tanga' ? size : selectedBottomSize);
       if (variant && variant.stock <= 0) {
         btn.classList.add('opacity-40', 'cursor-not-allowed', 'line-through');
         btn.title = 'Agotado';
@@ -189,17 +224,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
       btn.addEventListener('click', function () {
         if (!btn.classList.contains('cursor-not-allowed')) {
-          selectSize(size);
+          if (prefix === 'Top') {
+            selectTopSize(size);
+          } else {
+            selectBottomSize(size);
+          }
         }
       });
 
-      sizeOptionsContainer.appendChild(btn);
+      container.appendChild(btn);
     });
+  }
+
+  function renderSizes() {
+    if (!selectedColor) {
+      topSizeOptionsContainer.innerHTML = '';
+      bottomSizeOptionsContainer.innerHTML = '';
+      return;
+    }
+    renderSizeOptions(topSizeOptionsContainer, getTopSizesForColor(selectedColor), selectedTopSize, 'Top');
+    renderSizeOptions(bottomSizeOptionsContainer, getBottomSizesForColor(selectedColor), selectedBottomSize, 'Tanga');
   }
 
   function selectColor(colorSlug) {
     selectedColor = colorSlug;
-    selectedSize = null;
+    selectedTopSize = null;
+    selectedBottomSize = null;
 
     document.querySelectorAll('#colorOptions button').forEach(function (btn) {
       var isActive = btn.getAttribute('data-color') === colorSlug;
@@ -213,11 +263,22 @@ document.addEventListener('DOMContentLoaded', function () {
     updateSelection();
   }
 
-  function selectSize(size) {
-    selectedSize = size;
+  function selectTopSize(size) {
+    selectedTopSize = size;
+    markSelectedSize(topSizeOptionsContainer, size);
+    updateSelection();
+  }
 
-    document.querySelectorAll('#sizeOptions button').forEach(function (btn) {
-      var isActive = btn.getAttribute('data-size') === size;
+  function selectBottomSize(size) {
+    selectedBottomSize = size;
+    markSelectedSize(bottomSizeOptionsContainer, size);
+    updateSelection();
+  }
+
+  function markSelectedSize(container, size) {
+    if (!container) return;
+    container.querySelectorAll('button').forEach(function (btn) {
+      var isActive = btn.getAttribute('data-size') === size && !btn.classList.contains('cursor-not-allowed');
       btn.classList.toggle('bg-marplata-primary', isActive);
       btn.classList.toggle('text-white', isActive);
       btn.classList.toggle('border-marplata-primary', isActive);
@@ -225,8 +286,6 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.classList.toggle('text-marplata-text', !isActive);
       btn.classList.toggle('border-marplata-secondary', !isActive);
     });
-
-    updateSelection();
   }
 
   function formatPrice(value) {
@@ -236,8 +295,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function updateSelection() {
     var variant = null;
-    if (selectedColor && selectedSize) {
-      variant = getVariant(selectedColor, selectedSize);
+    if (selectedColor && selectedTopSize && selectedBottomSize) {
+      variant = getVariant(selectedColor, selectedTopSize, selectedBottomSize);
     }
 
     if (variant) {
@@ -256,30 +315,30 @@ document.addEventListener('DOMContentLoaded', function () {
         if (buyWhatsappBtn) buyWhatsappBtn.classList.add('hidden');
       }
 
-      renderImages(variant);
+      renderImagesForColor(selectedColor);
     } else {
       productPrice.textContent = formatPrice(basePrice);
-      stockStatus.innerHTML = selectedColor ? 'Selecciona una talla' : 'Selecciona color y talla';
+      if (!selectedColor) {
+        stockStatus.innerHTML = 'Selecciona color y tallas';
+      } else if (!selectedTopSize || !selectedBottomSize) {
+        stockStatus.innerHTML = 'Selecciona talla top y tanga';
+      } else {
+        stockStatus.innerHTML = 'Combinación no disponible';
+      }
       stockStatus.className = 'product-detail__stock-status inline-flex items-center gap-2 text-sm font-medium text-marplata-text-muted';
       addToCartBtn.disabled = true;
 
-      var anyVariant = null;
-      if (selectedColor) {
-        anyVariant = variants.find(function (v) { return v.color_slug === selectedColor; });
-      } else if (variants.length) {
-        anyVariant = variants[0];
-      }
-      renderImages(anyVariant);
+      renderImagesForColor(selectedColor);
     }
   }
 
-  function renderImages(variant) {
+  function renderImagesForColor(colorSlug) {
     thumbnailContainer.innerHTML = '';
-    var variantImages = (variant && variant.images) ? variant.images : [];
     currentImageIndex = 0;
 
-    if (variantImages.length > 0) {
-      currentImages = variantImages;
+    var colorImages = colorSlug ? getImagesForColor(colorSlug) : [];
+    if (colorImages.length > 0) {
+      currentImages = colorImages;
     } else if (coverImage) {
       currentImages = [{ url: coverImage, alt: '' }];
     } else {
@@ -446,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   addToCartBtn.addEventListener('click', function () {
-    var variant = getVariant(selectedColor, selectedSize);
+    var variant = getVariant(selectedColor, selectedTopSize, selectedBottomSize);
     if (!variant) return;
 
     addToCartBtn.disabled = true;
@@ -517,6 +576,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (variants.length > 0) {
     selectColor(variants[0].color_slug);
+    var topSizes = getTopSizesForColor(selectedColor);
+    var bottomSizes = getBottomSizesForColor(selectedColor);
+    if (topSizes.length) selectTopSize(topSizes[0]);
+    if (bottomSizes.length) selectBottomSize(bottomSizes[0]);
   } else {
     if (coverImage) {
       setImage(coverImage, '');
