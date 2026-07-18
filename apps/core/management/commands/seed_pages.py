@@ -4,6 +4,16 @@ from apps.core.models import Page
 
 PAGES_DATA = [
     {
+        "slug": "ropa-de-playa",
+        "title": "Ropa de playa",
+        "subtitle": "Próximamente.",
+        "footer_section": "",
+        "show_in_footer": False,
+        "order": 0,
+        "content": """<p>Estamos preparando una selección especial de ropa de playa para acompañarte antes, durante y después del mar.</p>
+<p>Volvé pronto para descubrir las nuevas piezas.</p>""",
+    },
+    {
         "slug": "nosotros",
         "title": "Nuestra historia",
         "subtitle": "Inspiradas en el mar, creadas para vos.",

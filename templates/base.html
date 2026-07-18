@@ -76,8 +76,8 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center gap-10 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-                    <a href="{% url 'catalog:product_list' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_color %}text-marplata-text{% endblock %} link-underline">Colecciones</a>
-                    <a href="{% url 'catalog:product_list' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_muted_color %}text-marplata-text-light{% endblock %} link-underline">Nuevo</a>
+                    <a href="{% url 'catalog:product_list' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_color %}text-marplata-text{% endblock %} link-underline">Vestidos de baño</a>
+                    <a href="{% url 'page_detail' 'ropa-de-playa' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_muted_color %}text-marplata-text-light{% endblock %} link-underline">Ropa de playa</a>
                     <a href="{% url 'page_detail' 'nosotros' %}" class="text-xs font-normal uppercase tracking-[0.2em] {% block navbar_link_muted_color_2 %}text-marplata-text-light{% endblock %} link-underline">Nosotros</a>
                 </div>
 
@@ -115,8 +115,8 @@
                     </button>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <a href="{% url 'catalog:product_list' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Colecciones</a>
-                    <a href="{% url 'catalog:product_list' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Nuevo</a>
+                    <a href="{% url 'catalog:product_list' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Vestidos de baño</a>
+                    <a href="{% url 'page_detail' 'ropa-de-playa' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Ropa de playa</a>
                     <a href="{% url 'page_detail' 'nosotros' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Nosotros</a>
                     <a href="{% url 'page_detail' 'contacto' %}" class="block py-3 text-3xl sm:text-4xl font-heading text-white">Contacto</a>
                 </div>
