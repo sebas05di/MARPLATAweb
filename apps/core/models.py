@@ -117,6 +117,7 @@ class Page(models.Model):
         ('envios-devoluciones', _('Envíos y devoluciones')),
         ('politica-privacidad', _('Política de privacidad')),
         ('terminos-condiciones', _('Términos y condiciones')),
+        ('cuidados-prenda', _('Cuidados de la prenda')),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -142,8 +143,10 @@ class Page(models.Model):
         blank=True,
         choices=[
             ('', _('Sin sección específica')),
-            ('navegacion', _('Navegación')),
+            ('historia', _('Nuestra historia')),
             ('legal', _('Legal')),
+            ('envios', _('Envíos')),
+            ('cuidados', _('Cuidados de la prenda')),
             ('ayuda', _('Ayuda')),
         ],
         default='legal',

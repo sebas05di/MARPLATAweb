@@ -11,14 +11,14 @@
                 {% if collection %}{{ collection.name }}{% else %}Toda la colección{% endif %}
             </h1>
             <p class="text-marplata-text-light font-light max-w-xl mx-auto">
-                Descubre piezas diseñadas para realzar tu esencia en cada momento junto al mar.
+                Diseña tu estilo, resalta tu esencia.
             </p>
         </div>
 
         <!-- Filters -->
         <div class="flex flex-wrap items-center justify-center gap-3 mb-14 lg:mb-20">
-            <a href="{% url 'catalog:product_list' %}" class="px-5 py-2.5 text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 {% if not collection %}bg-marplata-primary text-white{% else %}bg-white text-marplata-text border border-marplata-secondary-light hover:border-marplata-primary{% endif %}">
-                Todas
+                <a href="{% url 'catalog:product_list' %}" class="px-5 py-2.5 text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 {% if not collection %}bg-marplata-primary text-white{% else %}bg-white text-marplata-text border border-marplata-secondary-light hover:border-marplata-primary{% endif %}">
+                Todo
             </a>
             {% for col in collections %}
             <a href="{% url 'catalog:product_list_by_collection' col.slug %}" class="px-5 py-2.5 text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 {% if collection.slug == col.slug %}bg-marplata-primary text-white{% else %}bg-white text-marplata-text border border-marplata-secondary-light hover:border-marplata-primary{% endif %}">
@@ -58,7 +58,7 @@
                     <h3 class="text-base lg:text-lg font-normal text-marplata-text mb-2 group-hover:text-marplata-primary transition-colors">
                         <a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a>
                     </h3>
-                    <p class="text-sm text-marplata-text-light">${{ product.base_price|floatformat:0 }}</p>
+                    <p class="text-sm text-marplata-text-light">{{ product.base_price|floatformat:0 }}</p>
                 </div>
             </div>
             {% empty %}

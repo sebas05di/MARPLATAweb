@@ -35,7 +35,7 @@
                     <h3 class="text-base lg:text-lg font-normal text-marplata-text mb-2 group-hover:text-marplata-primary transition-colors">
                         <a href="{% url 'product_detail' item.product.slug %}">{{ item.product.name }}</a>
                     </h3>
-                    <p class="text-sm text-marplata-text-light">${{ item.product.base_price|floatformat:0 }}</p>
+                    <p class="text-sm text-marplata-text-light">{{ item.product.base_price|floatformat:0 }}</p>
                 </div>
             </div>
             {% endfor %}

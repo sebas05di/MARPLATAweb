@@ -8,7 +8,7 @@ from apps.core.models import SiteConfig, Page
 def home(request):
     featured_products = (
         Product.objects
-        .filter(is_active=True, collection__slug='esencia')
+        .filter(is_active=True)
         .select_related('collection')
         .prefetch_related('variants', 'variants__images')
         .order_by('name')[:8]

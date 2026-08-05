@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var variants = productData.variants || [];
   var basePrice = productData.basePrice || 0;
   var coverImage = productData.coverImage || null;
+  var hasBottom = productData.hasBottom !== false;
 
   if (!variants.length) {
     console.warn('[MARPLATA] No variants available');
@@ -10,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var selectedColor = null;
   var selectedTopSize = null;
-  var selectedBottomSize = null;
+  var selectedBottomSize = hasBottom ? null : (variants[0] ? variants[0].bottom_size : null);
   var currentImages = [];
   var currentImageIndex = 0;
 
@@ -35,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
   var lightboxNextBtn = document.getElementById('lightboxNextBtn');
 
-  if (!mainImage || !colorOptionsContainer || !topSizeOptionsContainer || !bottomSizeOptionsContainer || !addToCartBtn) {
+  if (!mainImage || !topSizeOptionsContainer || !addToCartBtn || (hasBottom && !bottomSizeOptionsContainer)) {
     console.error('[MARPLATA] Required DOM elements missing');
     return;
   }
@@ -239,11 +240,17 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderSizes() {
     if (!selectedColor) {
       topSizeOptionsContainer.innerHTML = '';
-      bottomSizeOptionsContainer.innerHTML = '';
+      if (bottomSizeOptionsContainer) bottomSizeOptionsContainer.innerHTML = '';
       return;
     }
+    if (!hasBottom) {
+      var firstBottom = variants.find(function (v) { return v.color_slug === selectedColor; });
+      if (firstBottom) selectedBottomSize = firstBottom.bottom_size;
+    }
     renderSizeOptions(topSizeOptionsContainer, getTopSizesForColor(selectedColor), selectedTopSize, 'Top');
-    renderSizeOptions(bottomSizeOptionsContainer, getBottomSizesForColor(selectedColor), selectedBottomSize, 'Tanga');
+    if (hasBottom && bottomSizeOptionsContainer) {
+      renderSizeOptions(bottomSizeOptionsContainer, getBottomSizesForColor(selectedColor), selectedBottomSize, 'Tanga');
+    }
   }
 
   function selectColor(colorSlug) {
@@ -290,12 +297,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function formatPrice(value) {
     var num = Number(value) || 0;
-    return '$' + Math.round(num).toLocaleString('es-CO');
+    return Math.round(num).toLocaleString('es-CO');
   }
 
   function updateSelection() {
     var variant = null;
-    if (selectedColor && selectedTopSize && selectedBottomSize) {
+    var selectionComplete = selectedColor && selectedTopSize;
+    if (hasBottom) {
+      selectionComplete = selectionComplete && selectedBottomSize;
+    }
+    if (selectionComplete) {
       variant = getVariant(selectedColor, selectedTopSize, selectedBottomSize);
     }
 
@@ -307,26 +318,27 @@ document.addEventListener('DOMContentLoaded', function () {
         stockStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Disponible (' + variant.stock + ' unidades)';
         stockStatus.className = 'product-detail__stock-status inline-flex items-center gap-2 text-sm font-medium text-emerald-600';
         addToCartBtn.disabled = false;
-        if (buyWhatsappBtn) buyWhatsappBtn.classList.remove('hidden');
+        if (buyWhatsappBtn) buyWhatsappBtn.disabled = false;
       } else {
         stockStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-marplata-danger"></span> Agotado';
         stockStatus.className = 'product-detail__stock-status inline-flex items-center gap-2 text-sm font-medium text-marplata-danger';
         addToCartBtn.disabled = true;
-        if (buyWhatsappBtn) buyWhatsappBtn.classList.add('hidden');
+        if (buyWhatsappBtn) buyWhatsappBtn.disabled = true;
       }
 
       renderImagesForColor(selectedColor);
     } else {
       productPrice.textContent = formatPrice(basePrice);
       if (!selectedColor) {
-        stockStatus.innerHTML = 'Selecciona color y tallas';
-      } else if (!selectedTopSize || !selectedBottomSize) {
-        stockStatus.innerHTML = 'Selecciona talla top y tanga';
+        stockStatus.innerHTML = 'Selecciona color y talla';
+      } else if (!selectedTopSize || (hasBottom && !selectedBottomSize)) {
+        stockStatus.innerHTML = hasBottom ? 'Selecciona talla top y tanga' : 'Selecciona tu talla';
       } else {
         stockStatus.innerHTML = 'Combinación no disponible';
       }
       stockStatus.className = 'product-detail__stock-status inline-flex items-center gap-2 text-sm font-medium text-marplata-text-muted';
       addToCartBtn.disabled = true;
+      if (buyWhatsappBtn) buyWhatsappBtn.disabled = true;
 
       renderImagesForColor(selectedColor);
     }
@@ -504,13 +516,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  addToCartBtn.addEventListener('click', function () {
-    var variant = getVariant(selectedColor, selectedTopSize, selectedBottomSize);
-    if (!variant) return;
-
-    addToCartBtn.disabled = true;
-    var originalText = addToCartBtn.textContent;
-    addToCartBtn.textContent = 'Agregando...';
+  function addVariantToCart(variant, button, onSuccess) {
+    button.disabled = true;
+    var originalText = button.textContent;
+    button.textContent = 'Agregando...';
 
     var formData = new FormData();
     formData.append('variant_id', variant.id);
@@ -528,32 +537,53 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(function (data) {
       if (data.success) {
         updateCartCounter(data.total_items);
-        addToCartBtn.textContent = 'Agregado';
-        addToCartBtn.classList.remove('bg-marplata-primary', 'hover:bg-marplata-primary-dark');
-        addToCartBtn.classList.add('bg-emerald-600');
-        setTimeout(function () {
-          addToCartBtn.textContent = originalText;
-          addToCartBtn.disabled = false;
-          addToCartBtn.classList.remove('bg-emerald-600');
-          addToCartBtn.classList.add('bg-marplata-primary', 'hover:bg-marplata-primary-dark');
-        }, 1500);
+        onSuccess(button, originalText);
       } else {
-        addToCartBtn.textContent = data.error || 'No se pudo agregar';
+        button.textContent = data.error || 'No se pudo agregar';
         setTimeout(function () {
-          addToCartBtn.textContent = originalText;
-          addToCartBtn.disabled = false;
+          button.textContent = originalText;
+          button.disabled = false;
         }, 2500);
       }
     })
     .catch(function (err) {
       console.error('[MARPLATA] Add to cart error:', err);
-      addToCartBtn.textContent = 'Error de conexión';
+      button.textContent = 'Error de conexión';
       setTimeout(function () {
-        addToCartBtn.textContent = originalText;
-        addToCartBtn.disabled = false;
+        button.textContent = originalText;
+        button.disabled = false;
       }, 2500);
     });
+  }
+
+  addToCartBtn.addEventListener('click', function () {
+    var variant = getVariant(selectedColor, selectedTopSize, selectedBottomSize);
+    if (!variant) return;
+
+    addVariantToCart(variant, addToCartBtn, function (button, originalText) {
+      button.textContent = 'Agregado';
+      button.classList.remove('bg-marplata-primary', 'hover:bg-marplata-primary-dark');
+      button.classList.add('bg-emerald-600');
+      setTimeout(function () {
+        button.textContent = originalText;
+        button.disabled = false;
+        button.classList.remove('bg-emerald-600');
+        button.classList.add('bg-marplata-primary', 'hover:bg-marplata-primary-dark');
+      }, 1500);
+    });
   });
+
+  if (buyWhatsappBtn) {
+    buyWhatsappBtn.addEventListener('click', function () {
+      var variant = getVariant(selectedColor, selectedTopSize, selectedBottomSize);
+      if (!variant) return;
+
+      var checkoutUrl = buyWhatsappBtn.getAttribute('data-checkout-url') || '/checkout/';
+      addVariantToCart(variant, buyWhatsappBtn, function () {
+        window.location.href = checkoutUrl;
+      });
+    });
+  }
 
   function updateCartCounter(count) {
     var cartCountEl = document.getElementById('cartCount');
@@ -571,15 +601,19 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(function () {});
   }
 
-  renderColors();
   loadCartCount();
 
   if (variants.length > 0) {
     selectColor(variants[0].color_slug);
     var topSizes = getTopSizesForColor(selectedColor);
-    var bottomSizes = getBottomSizesForColor(selectedColor);
     if (topSizes.length) selectTopSize(topSizes[0]);
-    if (bottomSizes.length) selectBottomSize(bottomSizes[0]);
+    if (hasBottom) {
+      var bottomSizes = getBottomSizesForColor(selectedColor);
+      if (bottomSizes.length) selectBottomSize(bottomSizes[0]);
+    } else {
+      selectedBottomSize = variants[0].bottom_size;
+      updateSelection();
+    }
   } else {
     if (coverImage) {
       setImage(coverImage, '');

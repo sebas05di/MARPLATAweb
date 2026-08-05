@@ -16,24 +16,20 @@ PAGES_DATA = [
     {
         "slug": "nosotros",
         "title": "Nuestra historia",
-        "subtitle": "Inspiradas en el mar, creadas para vos.",
-        "footer_section": "navegacion",
+        "subtitle": "",
+        "footer_section": "historia",
         "order": 1,
-        "content": """<h2>Diseña tu estilo, resalta tu esencia</h2>
-<p>Cada vestido de baño MARPLATA nace de la pasión por el diseño y la conexión con el mar. Creamos piezas que celebran la individualidad y la confianza de quien las lleva.</p>
-<p>Inspirados en las costas de Mar del Plata, fusionamos siluetas atemporales con materiales de alta calidad para acompañarte en cada verano.</p>
-<h3>Nuestra filosofía</h3>
-<p>Creemos en la moda consciente: prendas duraderas, materiales seleccionados y procesos de producción respetuosos con el entorno y las personas que los hacen posible.</p>
-<h3>Hecho con amor</h3>
-<p>Cada pieza cuenta una historia. Desde el primer boceto hasta el envío a tu hogar, ponemos dedicación en cada detalle para que te sientas única.</p>""",
+        "content": """<h2>Nuestra historia</h2>
+<p>Soy Ana María, fundadora de Mar Plata. Siempre soñé con crear una marca donde las mujeres encontraran mucho más que vestidos de baño: un universo de prendas y complementos que las acompañaran en cada momento.</p>
+<p>Diseñamos piezas atemporales y versátiles, pensadas para adaptarse a diferentes siluetas y resaltar la esencia de cada mujer.</p>""",
     },
     {
         "slug": "contacto",
         "title": "Contacto",
-        "subtitle": "Estamos para ayudarte. Escribinos por el canal que prefieras.",
+        "subtitle": "Estamos para ayudarte.",
         "footer_section": "ayuda",
         "order": 1,
-        "content": """<p>¿Tenés alguna pregunta sobre nuestros productos, tu pedido o querés asesoramiento personalizado? No dudes en escribirnos.</p>
+        "content": """<p>¿Tienes alguna duda sobre nuestros productos, tu pedido o quieres asesoramiento personalizado? No dudes en escribirnos.</p>
 <p>Atención personalizada por WhatsApp, donde podemos ayudarte con:</p>
 <ul>
 <li>Consultas sobre talles y colores</li>
@@ -46,19 +42,37 @@ PAGES_DATA = [
     },
     {
         "slug": "envios-devoluciones",
-        "title": "Envíos y devoluciones",
-        "subtitle": "Información sobre entregas, costos y política de cambios.",
-        "footer_section": "ayuda",
+        "title": "Envíos",
+        "subtitle": "Información sobre entregas, costos y tiempos de envío.",
+        "footer_section": "envios",
         "order": 2,
         "content": """<h2>Envíos</h2>
-<p>Realizamos envíos a toda Colombia. Una vez confirmado tu pedido por WhatsApp, te enviaremos el producto en un plazo de 3 a 5 días hábiles a ciudades principales, y de 5 a 8 días hábiles a otras zonas.</p>
-<h3>Costos de envío</h3>
-<p>El costo de envío depende de la ciudad de destino. Te lo confirmaremos por WhatsApp junto con el resto de los detalles de tu pedido antes de finalizar la compra.</p>
-<h3>Tracking</h3>
-<p>Te enviaremos el número de guía para que puedas rastrear tu pedido una vez despachado.</p>
-<h2>Devoluciones y cambios</h2>
-<p>Aceptamos cambios dentro de los 15 días posteriores a la recepción, siempre que la prenda esté en perfecto estado, con etiquetas y sin uso.</p>
-<p>Para iniciar un cambio, escribinos por WhatsApp con tu número de orden.</p>""",
+<p>En Mar Plata realizamos envíos a todo Colombia a través de Coordinadora.</p>
+<p>El costo del envío será asumido por el cliente y se calculará automáticamente al finalizar la compra, antes de realizar el pago.</p>
+<p>Todos los pedidos son procesados en días hábiles (lunes a viernes) y despachados al siguiente día hábil una vez se confirme el pago. El tiempo estimado de entrega es de 2 a 5 días hábiles, dependiendo del destino. En temporadas de alta demanda, eventos promocionales o fechas especiales, los tiempos de entrega pueden extenderse.</p>
+<p>Una vez el pedido sea entregado a la empresa transportadora, el cliente recibirá la información necesaria para realizar el seguimiento de su envío.</p>
+<p>Mar Plata no se hace responsable por retrasos, pérdidas o daños ocasionados durante el transporte, ya que estos procesos dependen directamente de la empresa transportadora. En caso de presentarse alguna novedad, el cliente podrá contactarnos y lo acompañaremos en la gestión correspondiente con la transportadora.</p>
+<p>No manejamos la modalidad de pago contra entrega. Todos los pedidos deben ser pagados en su totalidad antes de ser procesados y despachados.</p>
+<p>Una vez el pedido haya sido confirmado y el pago validado, no será posible cancelarlo.</p>""",
+    },
+    {
+        "slug": "cuidados-prenda",
+        "title": "Cuidados de la prenda",
+        "subtitle": "Cuidá tus piezas para que te acompañen más tiempo.",
+        "footer_section": "cuidados",
+        "order": 1,
+        "content": """<h2>Cuidados de la prenda</h2>
+<ul>
+<li>Lavar a mano únicamente con agua fría.</li>
+<li>Enjuagar inmediatamente después de cada uso para eliminar residuos de sal, cloro, arena y protector solar.</li>
+<li>No utilizar jabón, detergentes, blanqueadores ni suavizantes.</li>
+<li>No lavar en lavadora ni secar en secadora.</li>
+<li>No retorcer ni arrugar la prenda para escurrirla. Retirar el exceso de agua presionando suavemente con una toalla.</li>
+<li>Secar a la sombra y evitar la exposición prolongada al sol.</li>
+<li>Evitar el contacto con superficies ásperas que puedan ocasionar enganches o desgaste en la tela.</li>
+<li>No planchar ni lavar en seco.</li>
+<li>Guardar la prenda únicamente cuando esté completamente seca.</li>
+</ul>""",
     },
     {
         "slug": "politica-privacidad",
@@ -66,20 +80,11 @@ PAGES_DATA = [
         "subtitle": "Cómo cuidamos tus datos personales.",
         "footer_section": "legal",
         "order": 1,
-        "content": """<h2>Información que recopilamos</h2>
-<p>Recopilamos la información que nos proporcionas al registrarte, realizar un pedido o contactarnos: nombre, correo electrónico, teléfono y dirección de envío cuando corresponda.</p>
-<h2>Uso de la información</h2>
-<p>Usamos tus datos personales para:</p>
-<ul>
-<li>Procesar y enviar tus pedidos</li>
-<li>Responder a tus consultas</li>
-<li>Enviarte comunicaciones sobre tu cuenta o pedidos</li>
-<li>Mejorar nuestros servicios</li>
-</ul>
-<h2>Protección de datos</h2>
-<p>Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra acceso no autorizado, pérdida o alteración.</p>
-<h2>Tus derechos</h2>
-<p>Podés solicitar el acceso, rectificación o eliminación de tus datos personales en cualquier momento escribiéndonos a nuestro correo de contacto.</p>""",
+        "content": """<h2>Política de Privacidad</h2>
+<p>En Mar Plata valoramos la confianza de nuestros clientes y entendemos la importancia de proteger su información personal. Los datos que nos proporcionas a través de nuestro sitio web, como tu nombre, número de teléfono, correo electrónico, dirección de envío y demás información necesaria para procesar tu compra, serán utilizados exclusivamente para gestionar tus pedidos, realizar los envíos, brindar atención al cliente y mantenerte informado sobre el estado de tu compra. Si así lo autorizas, también podremos enviarte información sobre nuevos lanzamientos, promociones y novedades de la marca.</p>
+<p>Mar Plata adopta medidas razonables para proteger la información suministrada por sus clientes y evitar el acceso, el uso o la divulgación no autorizada de sus datos personales. Asimismo, nos comprometemos a no vender ni compartir tu información con terceros con fines comerciales. Tus datos únicamente podrán ser compartidos con proveedores indispensables para la prestación del servicio, como la empresa transportadora Coordinadora y la pasarela de pagos, con el único propósito de procesar tu compra y realizar la entrega de tu pedido de manera segura.</p>
+<p>Como titular de tus datos personales, podrás solicitar en cualquier momento la actualización, corrección o eliminación de tu información, así como realizar consultas relacionadas con el tratamiento de tus datos a través de nuestros canales oficiales de atención.</p>
+<p>Mar Plata podrá actualizar esta Política de Privacidad cuando sea necesario para mejorar sus procesos o dar cumplimiento a la normativa aplicable. Cualquier modificación será publicada en este sitio web y entrará en vigor a partir de su fecha de publicación.</p>""",
     },
     {
         "slug": "terminos-condiciones",
@@ -87,14 +92,30 @@ PAGES_DATA = [
         "subtitle": "Las reglas que rigen el uso de nuestro sitio y la compra de nuestros productos.",
         "footer_section": "legal",
         "order": 2,
-        "content": """<h2>Aceptación de los términos</h2>
-<p>Al utilizar este sitio y realizar pedidos, aceptas los presentes términos y condiciones. Si no estás de acuerdo con alguno de ellos, te pedimos que no utilices el sitio.</p>
-<h2>Proceso de compra</h2>
-<p>Nuestras ventas se realizan a través de WhatsApp. Al confirmar tu pedido, te enviaremos los datos de pago y una vez confirmado el pago, procederemos al envío.</p>
-<h2>Precios</h2>
-<p>Todos los precios están expresados en pesos colombianos e incluyen IVA. Los gastos de envío se confirman por WhatsApp antes de finalizar la compra.</p>
-<h2>Disponibilidad</h2>
-<p>Nos reservamos el derecho de modificar precios, descripciones y disponibilidad de los productos sin previo aviso.</p>""",
+        "content": """<h2>Términos y Condiciones</h2>
+<p>Gracias por elegir Mar Plata. Al realizar una compra con nosotros, declaras haber leído, entendido y aceptado nuestros términos, condiciones y políticas de compra.</p>
+<p>Mar Plata diseña y confecciona vestidos de baño, salidas de baño y accesorios de playa, creando piezas que combinan calidad, comodidad, diseño y estilo para resaltar la esencia de cada mujer.</p>
+<h2>Pagos</h2>
+<p>Todos los pedidos deben estar pagados en su totalidad antes de ser procesados. Actualmente no manejamos pagos contra entrega ni realizamos devoluciones de dinero.</p>
+<h2>Procesamiento y Envíos</h2>
+<p>Los pedidos realizados dentro de nuestro horario de atención podrán ser despachados el mismo día, sujeto a disponibilidad y confirmación del pago. Los pedidos realizados fuera de este horario serán procesados el siguiente día hábil.</p>
+<p>El tiempo estimado de entrega es de 1 a 3 días hábiles en ciudades principales, dependiendo de la transportadora aliada y la ubicación de destino.</p>
+<p>Una vez el pedido es entregado a la empresa transportadora, Mar Plata realizará seguimiento al estado del envío para acompañarte durante el proceso hasta la entrega. Sin embargo, factores externos propios de la operación logística, como retrasos, pérdidas o daños ocasionados durante el transporte, son responsabilidad de la empresa transportadora.</p>
+<h2>Producto y Color</h2>
+<p>En Mar Plata hacemos todo lo posible por mostrar con precisión los colores, estampados y detalles de cada prenda. Sin embargo, pueden presentarse ligeras variaciones debido a la iluminación de las fotografías o a la configuración de la pantalla desde la cual se visualice el producto.</p>
+<h2>Cambios y Devoluciones</h2>
+<p>Por razones de higiene, nuestros vestidos de baño no tienen cambios ni devoluciones por talla, gusto personal o preferencias estéticas.</p>
+<p>Por esta razón, recomendamos revisar cuidadosamente la guía de tallas antes de realizar tu compra.</p>
+<p>Únicamente se aceptarán cambios en los siguientes casos:</p>
+<ul>
+<li>Defectos de fabricación</li>
+<li>Imperfecciones de confección</li>
+<li>Error en el producto enviado</li>
+</ul>
+<p>Si tu producto presenta alguna novedad, deberás reportarla dentro de las primeras 24 horas después de recibirlo, enviando evidencia fotográfica o en video.</p>
+<p>Una vez validado el caso por nuestro equipo, Mar Plata podrá realizar el cambio o reemplazo de la prenda sin costo adicional.</p>
+<h2>Modificaciones</h2>
+<p>Mar Plata se reserva el derecho de modificar precios, referencias, disponibilidad, términos y condiciones en cualquier momento, sin previo aviso.</p>""",
     },
 ]
 

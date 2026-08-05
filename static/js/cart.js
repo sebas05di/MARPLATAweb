@@ -45,14 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  var checkoutBtn = document.getElementById('checkoutBtn');
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', function (e) {
-      e.preventDefault();
-      redirectToWhatsApp();
-    });
-  }
-
   function updateQuantity(variantId, quantity, input, cartItem) {
     var formData = new FormData();
     formData.append('variant_id', variantId);
@@ -120,33 +112,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (counter) {
       counter.textContent = count;
     }
-  }
-
-  function redirectToWhatsApp() {
-    fetch('/carrito/api/summary/')
-      .then(function (response) { return response.json(); })
-      .then(function (data) {
-        var items = data.items;
-        if (items.length === 0) return;
-
-        var message = 'Hola MARPLATA! Me interesa realizar un pedido:\n\n';
-        items.forEach(function (item) {
-          message += '• ' + item.product_name + ' (' + item.color + ' / ' + item.size + ') x' + item.quantity + ' — $' + Number(item.subtotal).toLocaleString('es-CO') + '\n';
-        });
-        message += '\nTotal: $' + Number(data.total).toLocaleString('es-CO') + '\n\nMi nombre: \nMi correo: \nMi teléfono: ';
-
-        fetch('/api/site-config/')
-          .then(function (r) { return r.json(); })
-          .then(function (config) {
-            var phone = (config.whatsapp_number || '').replace(/\D/g, '') || '573001234567';
-            var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
-            window.open(url, '_blank');
-          })
-          .catch(function () {
-            var url = 'https://wa.me/573001234567?text=' + encodeURIComponent(message);
-            window.open(url, '_blank');
-          });
-      });
   }
 
   function getCookie(name) {

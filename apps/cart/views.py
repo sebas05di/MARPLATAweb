@@ -39,6 +39,13 @@ def get_cart_items(request):
             primary_image = None
             if variant.images.exists():
                 primary_image = variant.images.first().image.url
+            if not primary_image and variant.product.primary_image:
+                primary_image = variant.product.primary_image.url
+
+            if variant.product.bottom_price:
+                size_label = f"Top {variant.top_size} / Tanga {variant.bottom_size}"
+            else:
+                size_label = f"Talla {variant.top_size}"
 
             items.append({
                 'variant_id': str(variant.id),
@@ -47,7 +54,7 @@ def get_cart_items(request):
                 'color': variant.color,
                 'top_size': variant.top_size,
                 'bottom_size': variant.bottom_size,
-                'size': f"Top {variant.top_size} / Tanga {variant.bottom_size}",
+                'size': size_label,
                 'quantity': quantity,
                 'unit_price': float(unit_price),
                 'subtotal': float(item_subtotal),

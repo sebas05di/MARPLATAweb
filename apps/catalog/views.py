@@ -6,7 +6,7 @@ from .models import Product, Collection
 
 
 def product_list(request, collection_slug=None):
-    collections = Collection.objects.filter(is_active=True)
+    collections = Collection.objects.filter(is_active=True).order_by('-name')
     products = Product.objects.filter(is_active=True).select_related('collection').prefetch_related('variants', 'variants__images')
 
     collection = None

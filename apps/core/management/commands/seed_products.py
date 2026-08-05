@@ -21,6 +21,8 @@ PRODUCTS = {
     'aura-beige': {
         'name': 'Aura Beige',
         'color': 'Beige',
+        'collection_slug': 'esencia',
+        'collection_name': 'ESENCIA',
         'top_price': Decimal('70000'),
         'bottom_price': Decimal('60000'),
         'description': 'Vestido de baño Aura en tono beige, con diseño versátil que se adapta a diferentes siluetas.',
@@ -30,6 +32,8 @@ PRODUCTS = {
     'aura-verde-olivo': {
         'name': 'Aura Verde Olivo',
         'color': 'Verde Olivo',
+        'collection_slug': 'esencia',
+        'collection_name': 'ESENCIA',
         'top_price': Decimal('70000'),
         'bottom_price': Decimal('60000'),
         'description': 'Vestido de baño Aura en verde olivo, elegante y atemporal.',
@@ -39,11 +43,24 @@ PRODUCTS = {
     'brisa': {
         'name': 'Brisa Mocca',
         'color': 'Mocca',
+        'collection_slug': 'esencia',
+        'collection_name': 'ESENCIA',
         'top_price': Decimal('80000'),
         'bottom_price': Decimal('80000'),
         'description': 'Vestido de baño Brisa en tono mocca, sofisticado y cómodo.',
         'story': 'Brisa combina elegancia y frescura para días de playa inolvidables.',
         'materials': '80% poliamida, 20% elastano.',
+    },
+    'bruma': {
+        'name': 'Bruma',
+        'color': 'Beige',
+        'collection_slug': 'ropa-de-playa',
+        'collection_name': 'Ropa de playa',
+        'top_price': Decimal('110000'),
+        'bottom_price': Decimal('0'),
+        'description': 'Bruma es una salida de baño ligera y versátil, ideal para completar tu look de playa.',
+        'story': 'Diseñada para acompañarte antes y después del mar con estilo y comodidad.',
+        'materials': '100% viscosa.',
     },
 }
 
@@ -55,6 +72,7 @@ OLD_SLUGS_TO_DELETE = [
     'brisa-mocca-top',
     'brisa-mocca-tanga',
     'salida-de-playa',
+    'salida-de-bano',
 ]
 
 
@@ -68,10 +86,26 @@ class Command(BaseCommand):
 
         MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 
-        collection, _ = Collection.objects.get_or_create(
-            slug='esencia',
-            defaults={'name': 'ESENCIA', 'description': 'Colección principal de vestidos de baño MARPLATA.'},
-        )
+        collections_cache = {}
+
+        def get_collection(slug, name):
+            if slug not in collections_cache:
+                descriptions = {
+                    'esencia': 'Colección principal de vestidos de baño MARPLATA.',
+                    'ropa-de-playa': 'Piezas ideales para acompañar tus días de playa.',
+                }
+                display_names = {
+                    'esencia': 'Vestidos de baño',
+                    'ropa-de-playa': 'Ropa de playa',
+                }
+                collections_cache[slug], _ = Collection.objects.get_or_create(
+                    slug=slug,
+                    defaults={'name': display_names.get(slug, name), 'description': descriptions.get(slug, '')},
+                )
+                if collections_cache[slug].name != display_names.get(slug, name):
+                    collections_cache[slug].name = display_names.get(slug, name)
+                    collections_cache[slug].save(update_fields=['name'])
+            return collections_cache[slug]
 
         # Group source files by prefix
         groups = {}
@@ -97,6 +131,7 @@ class Command(BaseCommand):
 
                 slug = slugify(meta['name'])
                 base_price = meta['top_price'] + meta['bottom_price']
+                collection = get_collection(meta['collection_slug'], meta['collection_name'])
 
                 product, created = Product.objects.update_or_create(
                     slug=slug,

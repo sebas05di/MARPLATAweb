@@ -10,8 +10,10 @@ def site_config(request):
     ).order_by('footer_section', 'order', 'title')
 
     footer_pages = {
-        'navegacion': [],
+        'historia': [],
         'legal': [],
+        'envios': [],
+        'cuidados': [],
         'ayuda': [],
     }
     for page in pages:
