@@ -115,10 +115,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# VS Code
+# IDE
 .vscode/
-
-# PyCharm
 .idea/
 
 # Email dev logs
@@ -131,9 +129,10 @@ Thumbs.db
 # Playwright
 .playwright-mcp/
 
-# Email logs
-email_logs/
-
 # Node.js
 node_modules/
+
+# Server runtime logs (local)
+server_out.log
+server_err.log
 

@@ -3,18 +3,25 @@
 
 {% block content %}
 <section class="py-16 lg:py-24 bg-marplata-neutral min-h-[60vh]">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <span class="section-label mb-4 block">MARPLATA</span>
             <h1 class="font-heading text-4xl lg:text-5xl font-light tracking-tight-custom text-marplata-text mb-4">{{ page.title }}</h1>
             {% if page.subtitle %}
             <p class="text-lg text-marplata-text-light font-light max-w-xl mx-auto">{{ page.subtitle }}</p>
             {% endif %}
         </div>
 
-        <article class="bg-white p-8 lg:p-12 shadow-soft prose prose-stone max-w-none">
-            <div class="text-marplata-text-light leading-relaxed font-light space-y-5 [&_h2]:font-heading [&_h2]:text-2xl [&_h2]:text-marplata-text [&_h2]:mt-8 [&_h2]:mb-4 [&_h3]:font-heading [&_h3]:text-xl [&_h3]:text-marplata-text [&_h3]:mt-6 [&_h3]:mb-3 [&_a]:text-marplata-primary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mb-1 [&_p]:mb-4 [&_strong]:text-marplata-text [&_strong]:font-medium">
+        <article class="bg-white p-8 lg:p-16 shadow-soft prose prose-stone max-w-none">
+            <div class="text-marplata-text-light leading-relaxed font-light space-y-5 [&_h2]:font-heading [&_h2]:text-2xl [&_h2]:text-marplata-text [&_h2]:mt-8 [&_h2]:mb-4 [&_h3]:font-heading [&_h3]:text-xl [&_h3]:text-marplata-text [&_h3]:mt-6 [&_h3]:mb-3 [&_a]:text-marplata-primary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mb-1 [&_p]:mb-4 [&_strong]:text-marplata-text [&_strong]:font-medium [&_hr]:border-marplata-secondary-light [&_hr]:my-8">
                 {{ page.content|safe }}
+                {% if page.slug == 'terminos-condiciones' %}
+                <hr>
+                {% if envios_page %}{{ envios_page.content|safe }}{% endif %}
+                <hr>
+                {% if cambios_page %}{{ cambios_page.content|safe }}{% endif %}
+                <hr>
+                <h2>Garantía</h2>
+                {% endif %}
             </div>
         </article>
 

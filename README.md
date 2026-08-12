@@ -1,13 +1,51 @@
 # MARPLATA — E-commerce de vestidos de baño
 
-Sitio web de e-commerce para **MARPLATA**, marca de vestidos de baño premium.
-Construido con Django + PostgreSQL + Tailwind CSS v4. Cierre de venta por WhatsApp.
+> **Diseña tu estilo, resalta tu esencia.**  
+> Plataforma de e-commerce para MARPLATA, marca de vestidos de baño premium.
+> Cierre de venta asistido por WhatsApp, panel de administración y dashboard de ventas.
 
-**Stack:** Django 4.2 · PostgreSQL 17 · Tailwind v4 · Garet + Jost · WhiteNoise · Jazzmin Admin
+[![Django](https://img.shields.io/badge/Django-4.2-092E20?logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
 ---
 
-## Setup rápido
+## ✨ Características
+
+- **Catálogo de productos** con colecciones, variantes (talla / color) y búsqueda.
+- **Carrito de compras** basado en sesión + **checkout** con cierre de venta por WhatsApp.
+- **Panel de administración** con [Jazzmin](https://github.com/farridav/django-jazzmin) (UI moderna sobre el admin nativo de Django).
+- **Dashboard de ventas** con métricas de pedidos (`/admin/dashboard/`).
+- **Cuentas de usuario**: registro, login, perfil, **wishlist** y **newsletter**.
+- **Páginas estáticas** dinámicas (nosotros, contacto, cuidados, cambios, envíos) gestionables desde el admin.
+- **SEO**: meta descriptions dinámicas, `sitemap.xml`, `robots.txt`, Open Graph y Twitter Cards.
+- **PWA**: `site.webmanifest` + favicons multi-resolución.
+- **Caché** de páginas estáticas frecuentes (5 min TTL) para reducir queries.
+- **Imágenes** optimizadas con [WhiteNoise](https://whitenoise.evans.io/) + soporte opcional de [Cloudinary](https://cloudinary.com/).
+- **Tracking de errores** opcional con [Sentry](https://sentry.io/).
+- **Deploy a producción** documentado (Gunicorn + WhiteNoise + PostgreSQL).
+
+---
+
+## 🛠 Stack técnico
+
+| Capa           | Tecnología                                                         |
+|----------------|--------------------------------------------------------------------|
+| Backend        | Django 4.2 · Python 3.11+                                          |
+| Base de datos  | PostgreSQL 17                                                      |
+| Frontend       | Tailwind CSS v4 · Garet + Jost · JavaScript vanilla                 |
+| Admin          | Jazzmin (sobre Django Admin)                                       |
+| Imágenes       | WhiteNoise · Cloudinary (opcional)                                  |
+| Caché          | LocMemCache (dev) · Redis (prod opcional)                          |
+| Emails         | SMTP (Gmail App Password)                                          |
+| Monitoring     | Sentry (opcional)                                                  |
+| Deploy         | Gunicorn · Render / Heroku · `render.yaml` + `Procfile`            |
+| DevOps         | Git · GitHub · entornos separados `dev` / `prod`                   |
+
+---
+
+## 🚀 Setup rápido
 
 ```bash
 # 1. Crear entorno virtual e instalar dependencias
@@ -23,20 +61,20 @@ npm run build:css
 # 3. Configurar variables de entorno
 copy .env.example .env                 # Windows
 cp .env.example .env                   # Mac/Linux
-# Editá .env con tus valores
+# Luego editá .env con tus valores
 
 # 4. Aplicar migraciones y crear datos base
 python manage.py migrate
 python manage.py seed_pages
 python manage.py createsuperuser
 
-# 5. Correr server
+# 5. Correr el servidor
 python manage.py runserver
 ```
 
 Abrí:
 - `http://localhost:8000/` — sitio público
-- `http://localhost:8000/admin/` — admin
+- `http://localhost:8000/admin/` — admin Jazzmin
 - `http://localhost:8000/admin/dashboard/` — dashboard de ventas
 
 ---

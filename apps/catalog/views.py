@@ -26,12 +26,18 @@ def product_list(request, collection_slug=None):
         ).values_list('product_id', flat=True):
             user_wishlist_ids.add(str(pid))
 
+    if collection:
+        meta_description = collection.description[:160] if collection.description else f'Explora {collection.name} de MARPLATA. Diseña tu estilo, resalta tu esencia.'
+    else:
+        meta_description = 'Explora toda la colección MARPLATA: vestidos de baño y ropa de playa. Diseña tu estilo, resalta tu esencia.'
+
     return render(request, 'catalog/product_list.html', {
         'products': products,
         'collections': collections,
         'collection': collection,
         'user_wishlist_ids': user_wishlist_ids,
         'page_title': collection.name if collection else 'Colección',
+        'page_meta_description': meta_description,
     })
 
 

@@ -124,6 +124,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Cache — LocMemCache (in-process memory), overridden in prod if Redis is available
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'marplata-cache',
+        'TIMEOUT': 300,  # 5 minutes default TTL
+        'KEY_PREFIX': 'marplata',
+    }
+}
+
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 

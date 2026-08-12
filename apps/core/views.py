@@ -16,6 +16,7 @@ def home(request):
 
     return render(request, 'pages/home.html', {
         'featured_products': featured_products,
+        'page_meta_description': 'Vestidos de baño y ropa de playa diseñados para resaltar tu esencia. Descubre la colección MARPLATA.',
     })
 
 

@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block content %}
-<section class="py-16 lg:py-24 bg-marplata-neutral min-h-[60vh]">
+<section class="{% if items %}py-16 lg:py-24{% else %}py-10{% endif %} bg-marplata-neutral min-h-[60vh]">
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        {% if items %}
         <div class="text-center mb-12 lg:mb-16">
             <span class="section-label mb-4 block">Carrito</span>
             <h1 class="font-heading text-4xl lg:text-5xl font-light tracking-tight-custom text-marplata-text">Tu selección</h1>
         </div>
 
-        {% if items %}
         <div class="grid lg:grid-cols-3 gap-10 lg:gap-16">
             <!-- Items -->
             <div class="lg:col-span-2 space-y-6">
@@ -97,11 +97,15 @@
             </div>
         </div>
         {% else %}
-        <div class="text-center py-20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-marplata-text-muted mb-6"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-            <h2 class="font-heading text-2xl text-marplata-text mb-3">Tu carrito está vacío</h2>
-            <p class="text-marplata-text-light mb-8 max-w-xs mx-auto">Explora nuestra colección y encuentra tu vestido de baño ideal.</p>
-            <a href="{% url 'catalog:product_list' %}" class="btn-primary">Ver colección</a>
+        <div class="max-w-sm mx-auto text-center pt-4">
+            <div class="w-16 h-px bg-marplata-secondary mx-auto mb-5"></div>
+            <span class="section-label mb-3 block">MARPLATA</span>
+            <h2 class="font-heading text-3xl lg:text-4xl font-light tracking-tight-custom text-marplata-text mb-5">Tu selección</h2>
+            <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-marplata-text-muted mb-5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <p class="text-lg text-marplata-text font-light mb-1">Aún no has elegido tus favoritos.</p>
+            <p class="text-marplata-text-light font-light mb-6">Descubre diseños versátiles y atemporales que resaltan tu esencia.</p>
+            <a href="{% url 'catalog:product_list' %}" class="inline-block px-12 py-4 border border-marplata-text text-marplata-text text-xs font-normal uppercase tracking-[0.25em] transition-all duration-300 hover:bg-marplata-text hover:text-white">Explorar colección</a>
+            <div class="w-16 h-px bg-marplata-secondary mx-auto mt-6"></div>
         </div>
         {% endif %}
     </div>

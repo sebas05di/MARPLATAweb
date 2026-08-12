@@ -118,6 +118,7 @@ class Page(models.Model):
         ('politica-privacidad', _('Política de privacidad')),
         ('terminos-condiciones', _('Términos y condiciones')),
         ('cuidados-prenda', _('Cuidados de la prenda')),
+        ('cambios-devoluciones', _('Cambios y devoluciones')),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -171,3 +172,15 @@ class Page(models.Model):
         if not self.meta_title:
             self.meta_title = self.title
         super().save(*args, **kwargs)
+        # Invalidate cached pages if applicable
+        if self.slug in ('cuidados-prenda', 'cambios-devoluciones', 'envios-devoluciones'):
+            from django.core.cache import cache
+            if self.slug == 'cuidados-prenda':
+                from .context_processors import CUIDADOS_CACHE_KEY
+                cache.delete(CUIDADOS_CACHE_KEY)
+            elif self.slug == 'cambios-devoluciones':
+                from .context_processors import CAMBIOS_CACHE_KEY
+                cache.delete(CAMBIOS_CACHE_KEY)
+            elif self.slug == 'envios-devoluciones':
+                from .context_processors import ENVIOS_CACHE_KEY
+                cache.delete(ENVIOS_CACHE_KEY)
