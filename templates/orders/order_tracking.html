@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load humanize %}
+{% load humanize price_format %}
 
 {% block title %}Pedido #{{ order.order_number }} | MARPLATA{% endblock %}
 
@@ -61,21 +61,21 @@
         <div class="flex-1">
           <p class="text-marplata-text font-medium">{{ item.product_name_snapshot }}</p>
           <p class="text-marplata-text-muted text-xs">{{ item.variant_snapshot }}</p>
-          <p class="text-marplata-text-light text-sm mt-1">{{ item.quantity }} × {{ item.unit_price|intcomma }}</p>
+          <p class="text-marplata-text-light text-sm mt-1">{{ item.quantity }} × {{ item.unit_price|price }}</p>
         </div>
-        <p class="text-marplata-text font-medium whitespace-nowrap">{{ item.subtotal|intcomma }}</p>
+        <p class="text-marplata-text font-medium whitespace-nowrap">{{ item.subtotal|price }}</p>
       </div>
       {% endfor %}
     </div>
     <div class="mt-6 pt-4 border-t border-marplata-secondary space-y-1 text-sm">
-      <div class="flex justify-between"><span class="text-marplata-text-light">Subtotal</span><span>{{ order.subtotal_amount|intcomma }}</span></div>
+      <div class="flex justify-between"><span class="text-marplata-text-light">Subtotal</span><span>{{ order.subtotal_amount|price }}</span></div>
       {% if order.discount_amount %}
-      <div class="flex justify-between text-marplata-success"><span>Descuento{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</span><span>-{{ order.discount_amount|intcomma }}</span></div>
+      <div class="flex justify-between text-marplata-success"><span>Descuento{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</span><span>-{{ order.discount_amount|price }}</span></div>
       {% endif %}
       {% if order.shipping_cost %}
-      <div class="flex justify-between"><span class="text-marplata-text-light">Envío</span><span>{{ order.shipping_cost|intcomma }}</span></div>
+      <div class="flex justify-between"><span class="text-marplata-text-light">Envío</span><span>{{ order.shipping_cost|price }}</span></div>
       {% endif %}
-      <div class="flex justify-between font-heading text-lg pt-2 border-t border-marplata-secondary-light"><span class="text-marplata-text">Total</span><span class="text-marplata-primary">{{ order.total_amount|intcomma }}</span></div>
+      <div class="flex justify-between font-heading text-lg pt-2 border-t border-marplata-secondary-light"><span class="text-marplata-text">Total</span><span class="text-marplata-primary">{{ order.total_amount|price }}</span></div>
     </div>
   </div>
 

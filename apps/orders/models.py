@@ -51,6 +51,7 @@ class WhatsAppOrder(models.Model):
         decimal_places=2,
         default=0,
     )
+    is_first_purchase = models.BooleanField(_('primera compra'), default=False)
 
     shipping_address = models.CharField(
         _('dirección de envío'), max_length=255, blank=True,

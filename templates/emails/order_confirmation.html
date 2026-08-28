@@ -1,4 +1,5 @@
 {% extends 'emails/base.html' %}
+{% load price_format %}
 {% load humanize %}
 {% block subject %}¡Pedido {{ order.order_number }} recibido!{% endblock %}
 
@@ -33,7 +34,7 @@
         <span style="color:#95A5A6;font-size:12px;">{{ item.variant.color.name }}{% if item.variant.size %} · Talla {{ item.variant.size }}{% endif %}</span>
       </td>
       <td align="center" style="padding:12px 0;color:#2C3E50;font-size:14px;">{{ item.quantity }}</td>
-      <td align="right" style="padding:12px 0;color:#2C3E50;font-size:14px;">${{ item.subtotal|intcomma }}</td>
+      <td align="right" style="padding:12px 0;color:#2C3E50;font-size:14px;">${{ item.subtotal|price }}</td>
     </tr>
     {% endfor %}
   </tbody>
@@ -42,21 +43,21 @@
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:24px;">
   <tr>
     <td align="right" style="padding:4px 0;color:#6C7A89;font-size:14px;">Subtotal:</td>
-    <td align="right" width="120" style="padding:4px 0 4px 16px;color:#2C3E50;font-size:14px;">${{ order.subtotal_amount|intcomma }}</td>
+    <td align="right" width="120" style="padding:4px 0 4px 16px;color:#2C3E50;font-size:14px;">${{ order.subtotal_amount|price }}</td>
   </tr>
   {% if order.discount_amount %}
   <tr>
     <td align="right" style="padding:4px 0;color:#27AE60;font-size:14px;">Descuento{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}:</td>
-    <td align="right" style="padding:4px 0 4px 16px;color:#27AE60;font-size:14px;">-${{ order.discount_amount|intcomma }}</td>
+    <td align="right" style="padding:4px 0 4px 16px;color:#27AE60;font-size:14px;">-${{ order.discount_amount|price }}</td>
   </tr>
   {% endif %}
   <tr>
     <td align="right" style="padding:4px 0;color:#6C7A89;font-size:14px;">Envío:</td>
-    <td align="right" style="padding:4px 0 4px 16px;color:#2C3E50;font-size:14px;">{{ order.shipping_cost|default:0|floatformat:0|intcomma }}</td>
+    <td align="right" style="padding:4px 0 4px 16px;color:#2C3E50;font-size:14px;">{{ order.shipping_cost|default:0|price }}</td>
   </tr>
   <tr style="border-top:2px solid #E8E0D8;">
     <td align="right" style="padding:12px 0 0;font-family:Georgia,serif;color:#2C3E50;font-size:18px;"><strong>Total:</strong></td>
-    <td align="right" style="padding:12px 0 0 16px;font-family:Georgia,serif;color:#6B8BC8;font-size:20px;"><strong>${{ order.total_amount|intcomma }}</strong></td>
+    <td align="right" style="padding:12px 0 0 16px;font-family:Georgia,serif;color:#6B8BC8;font-size:20px;"><strong>${{ order.total_amount|price }}</strong></td>
   </tr>
 </table>
 

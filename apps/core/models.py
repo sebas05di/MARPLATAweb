@@ -119,6 +119,7 @@ class Page(models.Model):
         ('terminos-condiciones', _('Términos y condiciones')),
         ('cuidados-prenda', _('Cuidados de la prenda')),
         ('cambios-devoluciones', _('Cambios y devoluciones')),
+        ('garantia', _('Garantía')),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -173,7 +174,7 @@ class Page(models.Model):
             self.meta_title = self.title
         super().save(*args, **kwargs)
         # Invalidate cached pages if applicable
-        if self.slug in ('cuidados-prenda', 'cambios-devoluciones', 'envios-devoluciones'):
+        if self.slug in ('cuidados-prenda', 'cambios-devoluciones', 'envios-devoluciones', 'garantia'):
             from django.core.cache import cache
             if self.slug == 'cuidados-prenda':
                 from .context_processors import CUIDADOS_CACHE_KEY
@@ -184,3 +185,6 @@ class Page(models.Model):
             elif self.slug == 'envios-devoluciones':
                 from .context_processors import ENVIOS_CACHE_KEY
                 cache.delete(ENVIOS_CACHE_KEY)
+            elif self.slug == 'garantia':
+                from .context_processors import GARANTIA_CACHE_KEY
+                cache.delete(GARANTIA_CACHE_KEY)

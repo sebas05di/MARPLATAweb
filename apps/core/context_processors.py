@@ -9,6 +9,8 @@ CAMBIOS_CACHE_KEY = 'cambios_page'
 CAMBIOS_CACHE_TTL = 300  # 5 minutes
 ENVIOS_CACHE_KEY = 'envios_page'
 ENVIOS_CACHE_TTL = 300  # 5 minutes
+GARANTIA_CACHE_KEY = 'garantia_page'
+GARANTIA_CACHE_TTL = 300  # 5 minutes
 
 
 def _get_cuidados_page():
@@ -38,6 +40,15 @@ def _get_envios_page():
     return page
 
 
+def _get_garantia_page():
+    """Return the 'garantia' Page, cached for GARANTIA_CACHE_TTL seconds."""
+    page = cache.get(GARANTIA_CACHE_KEY)
+    if page is None:
+        page = Page.objects.filter(slug='garantia', is_active=True).first()
+        cache.set(GARANTIA_CACHE_KEY, page, GARANTIA_CACHE_TTL)
+    return page
+
+
 def site_config(request):
     """Make SiteConfig, footer pages and care page available in all templates."""
     pages = Page.objects.filter(
@@ -61,5 +72,6 @@ def site_config(request):
         'cuidados_page': _get_cuidados_page(),
         'cambios_page': _get_cambios_page(),
         'envios_page': _get_envios_page(),
+        'garantia_page': _get_garantia_page(),
         'default_og_image': request.build_absolute_uri(static('img/branding/og-image.png')),
     }

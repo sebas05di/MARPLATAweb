@@ -10,16 +10,15 @@ from django.urls import reverse
 
 from apps.cart.views import get_cart_items, save_cart, clear_coupon
 from apps.catalog.models import ProductVariant, Promotion, CouponRedemption
+from apps.core.formatting import format_price
 from apps.core.models import SiteConfig
 from .models import WhatsAppOrder, WhatsAppOrderItem
 
 
 PAYMENT_METHOD_CHOICES = [
-    ('transferencia', 'Transferencia bancaria'),
-    ('nequi', 'Nequi / Daviplata'),
-    ('mercadopago', 'Mercado Pago'),
-    ('wompi', 'Wompi (tarjeta)'),
-    ('otro', 'Otro (acordar por WhatsApp)'),
+    ('transferencia', 'Transferencia Bancolombia'),
+    ('nequi', 'Nequi'),
+    ('wompi', 'Llaves'),
 ]
 
 
@@ -62,6 +61,23 @@ def checkout_whatsapp(request):
         messages.error(request, 'Completá todos los datos de envío para continuar.')
         return redirect('orders:checkout_form')
 
+    # Resolve coupon: only authenticated users can use coupons; validate per-user limits and first purchase.
+    applied_coupon = None
+    discount_amount = cart_data.get('discount', 0)
+    is_first_purchase = False
+    if user and cart_data.get('coupon'):
+        try:
+            coupon = Promotion.objects.get(code__iexact=cart_data['coupon']['code'])
+            valid, _ = coupon.is_valid(cart_data['subtotal'])
+            can_use, _ = coupon.can_use(user)
+            if valid and can_use:
+                applied_coupon = coupon
+                is_first_purchase = True
+            else:
+                discount_amount = 0
+        except Promotion.DoesNotExist:
+            discount_amount = 0
+
     try:
         with transaction.atomic():
             variant_ids = [item['variant_id'] for item in cart_data['items']]
@@ -87,8 +103,9 @@ def checkout_whatsapp(request):
                 customer_name=customer_name,
                 customer_phone=customer_phone,
                 status='pending',
-                coupon_code=cart_data['coupon']['code'] if cart_data.get('coupon') else '',
-                discount_amount=cart_data.get('discount', 0),
+                coupon_code=applied_coupon.code if applied_coupon else '',
+                discount_amount=discount_amount,
+                is_first_purchase=is_first_purchase,
                 shipping_address=shipping_address,
                 shipping_city=shipping_city,
                 shipping_department=shipping_department,
@@ -110,21 +127,16 @@ def checkout_whatsapp(request):
                 variant.stock = F('stock') - item['quantity']
                 variant.save(update_fields=['stock'])
 
-            coupon = None
-            if cart_data.get('coupon'):
-                try:
-                    coupon = Promotion.objects.get(code__iexact=cart_data['coupon']['code'])
-                    coupon.usage_count = F('usage_count') + 1
-                    coupon.save(update_fields=['usage_count'])
-                    CouponRedemption.objects.create(
-                        promotion=coupon,
-                        user=user,
-                        order=order,
-                        code_used=coupon.code,
-                        discount_applied=cart_data['discount'],
-                    )
-                except Promotion.DoesNotExist:
-                    coupon = None
+            if applied_coupon:
+                applied_coupon.usage_count = F('usage_count') + 1
+                applied_coupon.save(update_fields=['usage_count'])
+                CouponRedemption.objects.create(
+                    promotion=applied_coupon,
+                    user=user,
+                    order=order,
+                    code_used=applied_coupon.code,
+                    discount_applied=discount_amount,
+                )
 
             lines = [
                 "¡Hola! Quiero realizar un pedido en MARPLATA.",
@@ -139,20 +151,21 @@ def checkout_whatsapp(request):
 
             for item in order.items.all():
                 lines.append(
-                    f"- {item.quantity} x {item.product_name_snapshot} ({item.variant_snapshot}) — ${item.subtotal:,.0f}"
+                    f"- {item.quantity} x {item.product_name_snapshot} ({item.variant_snapshot}) — ${format_price(item.subtotal)}"
                 )
 
             order_subtotal = sum(float(item.subtotal) for item in order.items.all())
 
             lines.append("")
-            lines.append(f"*Subtotal:* ${order_subtotal:,.0f}")
+            lines.append(f"*Subtotal:* ${format_price(order_subtotal)}")
 
-            if cart_data.get('discount', 0) > 0:
+            if order.discount_amount > 0:
                 lines.append(
-                    f"*Descuento ({order.coupon_code}):* -${cart_data['discount']:,.0f}"
+                    f"*Descuento ({order.coupon_code}):* -${format_price(order.discount_amount)}"
                 )
 
-            lines.append(f"*Total:* ${order.total_amount:,.0f}")
+            lines.append("*Envío:* A confirmar")
+            lines.append("*Total:* Por confirmar (subtotal + envío)")
             lines.append("")
             lines.append("*Datos de envío:*")
             lines.append(f"{order.shipping_address}")
@@ -265,13 +278,15 @@ def build_whatsapp_message(order):
     total = 0
     for item in order.items.all():
         lines.append(
-            f"- {item.quantity} x {item.product_name_snapshot} ({item.variant_snapshot}) — ${item.subtotal:,.0f}"
+            f"- {item.quantity} x {item.product_name_snapshot} ({item.variant_snapshot}) — ${format_price(item.subtotal)}"
         )
         total += float(item.subtotal)
 
     lines.extend([
         f"",
-        f"*Total:* ${total:,.0f}",
+        f"*Subtotal:* ${format_price(total)}",
+        "*Envío:* A confirmar",
+        "*Total:* Por confirmar (subtotal + envío)",
         f"",
         f"Por favor confirmame disponibilidad y medios de pago. ¡Gracias!",
     ])

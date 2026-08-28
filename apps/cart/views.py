@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from apps.catalog.models import ProductVariant, Promotion
 
@@ -70,13 +71,18 @@ def get_cart_items(request):
     if coupon and subtotal > 0:
         valid, _ = coupon.is_valid(subtotal)
         if valid:
-            discount = coupon.calculate_discount(subtotal)
-            coupon_data = {
-                'code': coupon.code,
-                'name': coupon.name,
-                'discount_type': coupon.discount_type,
-                'discount_value': float(coupon.discount_value),
-            }
+            can_use, use_error = coupon.can_use(request.user)
+            if can_use:
+                discount = coupon.calculate_discount(subtotal)
+                coupon_data = {
+                    'code': coupon.code,
+                    'name': coupon.name,
+                    'discount_type': coupon.discount_type,
+                    'discount_value': float(coupon.discount_value),
+                }
+            else:
+                # Coupon is in session but user cannot use it (already used, not first purchase, etc.)
+                clear_coupon(request)
         else:
             clear_coupon(request)
 
@@ -271,9 +277,10 @@ def cart_detail(request):
     })
 
 
+@login_required
 @require_POST
 def coupon_apply(request):
-    """Apply a coupon code to the cart."""
+    """Apply a coupon code to the cart. Requires authentication."""
     code = (request.POST.get('code') or '').strip()
     if not code:
         return JsonResponse({'success': False, 'error': 'Ingresa un código.'}, status=400)
@@ -287,6 +294,10 @@ def coupon_apply(request):
     valid, error = promotion.is_valid(cart_data['subtotal'])
     if not valid:
         return JsonResponse({'success': False, 'error': error}, status=400)
+
+    can_use, use_error = promotion.can_use(request.user)
+    if not can_use:
+        return JsonResponse({'success': False, 'error': use_error}, status=400)
 
     request.session['coupon_code'] = promotion.code
     request.session.modified = True

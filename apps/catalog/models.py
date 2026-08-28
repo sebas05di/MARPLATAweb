@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.formatting import format_price
+
 
 class Collection(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -228,9 +230,16 @@ class Promotion(models.Model):
     usage_count = models.PositiveIntegerField(
         _('usos realizados'), default=0,
     )
-    start_date = models.DateTimeField(_('fecha de inicio'))
-    end_date = models.DateTimeField(_('fecha de fin'))
+    start_date = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
+    end_date = models.DateTimeField(_('fecha de fin'), null=True, blank=True)
     is_active = models.BooleanField(_('activo'), default=True)
+    max_uses_per_user = models.PositiveIntegerField(
+        _('máximo de usos por usuario'),
+        null=True,
+        blank=True,
+        default=None,
+        help_text=_('Vacío = ilimitado por usuario. 1 = una vez por usuario.'),
+    )
     applicable_collections = models.ManyToManyField(
         Collection,
         blank=True,
@@ -252,14 +261,33 @@ class Promotion(models.Model):
         now = timezone.now()
         if not self.is_active:
             return False, 'El cupón está inactivo.'
-        if now < self.start_date:
+        if self.start_date and now < self.start_date:
             return False, 'El cupón aún no está disponible.'
-        if now > self.end_date:
+        if self.end_date and now > self.end_date:
             return False, 'El cupón ha expirado.'
         if self.usage_limit and self.usage_count >= self.usage_limit:
             return False, 'El cupón ha alcanzado su límite de usos.'
         if cart_total is not None and self.min_purchase and cart_total < self.min_purchase:
-            return False, f'Necesitas una compra mínima de ${self.min_purchase:,.0f}.'
+            return False, f'Necesitas una compra mínima de ${format_price(self.min_purchase)}.'
+        return True, None
+
+    def is_first_purchase(self, user):
+        """Return True if the user has no previous WhatsAppOrder."""
+        if not user or not user.is_authenticated:
+            return False
+        from apps.orders.models import WhatsAppOrder
+        return not WhatsAppOrder.objects.filter(user=user).exists()
+
+    def can_use(self, user):
+        """Check if a specific user can use this promotion (login + per-user limit + first purchase)."""
+        if not user or not user.is_authenticated:
+            return False, 'Debes iniciar sesión para usar este cupón.'
+        if self.max_uses_per_user:
+            uses_count = self.redemptions.filter(user=user).count()
+            if uses_count >= self.max_uses_per_user:
+                return False, 'Ya usaste este cupón.'
+        if not self.is_first_purchase(user):
+            return False, 'Este cupón solo aplica en tu primera compra.'
         return True, None
 
     def calculate_discount(self, cart_total):

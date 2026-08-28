@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
+from apps.core.formatting import format_price
 from .models import WhatsAppOrder, WhatsAppOrderItem
 
 
@@ -65,11 +66,11 @@ class WhatsAppOrderAdmin(admin.ModelAdmin):
 
     @admin.display(description='Subtotal')
     def subtotal_amount(self, obj):
-        return f"${obj.subtotal_amount:,.0f}"
+        return f"${format_price(obj.subtotal_amount)}"
 
     @admin.display(description='Total')
     def total_amount(self, obj):
-        return f"${obj.total_amount:,.0f}"
+        return f"${format_price(obj.total_amount)}"
 
     @admin.display(description='Estado', ordering='status')
     def status_badge(self, obj):

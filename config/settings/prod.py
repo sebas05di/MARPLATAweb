@@ -66,7 +66,7 @@ X_FRAME_OPTIONS = 'DENY'
 # ---------------------------------------------------------------------------
 # Static files (WhiteNoise)
 # ---------------------------------------------------------------------------
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # ---------------------------------------------------------------------------
 # Media files — Cloudinary preferido; fallback local si no se configura

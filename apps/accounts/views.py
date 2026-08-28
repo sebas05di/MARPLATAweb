@@ -105,6 +105,21 @@ def register_view(request):
         auth_login(request, user)
         messages.success(request, '¡Tu cuenta ha sido creada exitosamente!')
 
+        # Unlock welcome coupon for new users on their first purchase
+        from apps.catalog.models import Promotion
+        try:
+            welcome_promo = Promotion.objects.get(code__iexact='ESENCIA', is_active=True)
+            can_use, _ = welcome_promo.can_use(user)
+            if can_use:
+                request.session['coupon_code'] = welcome_promo.code
+                request.session.modified = True
+                messages.success(
+                    request,
+                    f'¡Bienvenida a MARPLATA! Tu código de bienvenida es {welcome_promo.code}. Tenés un 10% de descuento en tu primera compra.'
+                )
+        except Promotion.DoesNotExist:
+            pass
+
         from apps.core.emails import send_welcome_email
         try:
             send_welcome_email(user)

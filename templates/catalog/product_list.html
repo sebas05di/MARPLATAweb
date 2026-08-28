@@ -1,31 +1,27 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static price_format %}
 
 {% block content %}
-<section class="py-16 lg:py-24 bg-marplata-neutral">
+<section class="page-section bg-marplata-neutral">
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="text-center mb-12 lg:mb-16">
-            <span class="section-label mb-4 block">Catálogo</span>
-            <h1 class="font-heading text-4xl lg:text-6xl font-light tracking-tight-custom mb-4 text-marplata-text">
+        <div class="page-title">
+            <h1 class="font-heading text-3xl lg:text-4xl font-light tracking-tight-custom text-marplata-text">
                 {% if collection %}{{ collection.name }}{% else %}Toda la colección{% endif %}
             </h1>
-            <p class="text-marplata-text-light font-light max-w-xl mx-auto">
-                Diseña tu estilo, resalta tu esencia.
-            </p>
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-wrap items-center justify-center gap-3 mb-14 lg:mb-20">
-                <a href="{% url 'catalog:product_list' %}" class="px-5 py-2.5 text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 {% if not collection %}bg-marplata-primary text-white{% else %}bg-white text-marplata-text border border-marplata-secondary-light hover:border-marplata-primary{% endif %}">
+        <nav aria-label="Filtros de colección" class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 lg:gap-10 mb-10 lg:mb-14">
+            <a href="{% url 'catalog:product_list' %}" class="pb-1 text-xs font-normal uppercase tracking-wide-custom transition-colors duration-200 {% if not collection %}text-marplata-text border-b border-marplata-primary{% else %}text-marplata-text-light hover:text-marplata-text border-b border-transparent hover:border-marplata-secondary-light{% endif %}">
                 Todo
             </a>
             {% for col in collections %}
-            <a href="{% url 'catalog:product_list_by_collection' col.slug %}" class="px-5 py-2.5 text-xs font-normal uppercase tracking-wide-custom transition-all duration-300 {% if collection.slug == col.slug %}bg-marplata-primary text-white{% else %}bg-white text-marplata-text border border-marplata-secondary-light hover:border-marplata-primary{% endif %}">
+            <a href="{% url 'catalog:product_list_by_collection' col.slug %}" class="pb-1 text-xs font-normal uppercase tracking-wide-custom transition-colors duration-200 {% if collection.slug == col.slug %}text-marplata-text border-b border-marplata-primary{% else %}text-marplata-text-light hover:text-marplata-text border-b border-transparent hover:border-marplata-secondary-light{% endif %}">
                 {{ col.name }}
             </a>
             {% endfor %}
-        </div>
+        </nav>
 
         <!-- Product Grid -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 lg:gap-x-8 lg:gap-y-14">
@@ -58,7 +54,7 @@
                     <h3 class="text-base lg:text-lg font-normal text-marplata-text mb-2 group-hover:text-marplata-primary transition-colors">
                         <a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a>
                     </h3>
-                    <p class="text-sm text-marplata-text-light">{{ product.base_price|floatformat:0 }}</p>
+                    <p class="text-sm text-marplata-text-light">{{ product.base_price|price }}</p>
                 </div>
             </div>
             {% empty %}

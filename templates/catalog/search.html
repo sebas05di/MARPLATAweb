@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static price_format %}
 
 {% block content %}
 <section class="py-16 lg:py-24 bg-marplata-neutral min-h-[60vh]">
@@ -63,7 +63,7 @@
                         <p class="text-xs uppercase tracking-wide-custom text-marplata-text-muted mb-2">{{ product.collection.name }}</p>
                         {% endif %}
                         <h3 class="text-base lg:text-lg font-normal text-marplata-text mb-2 group-hover:text-marplata-primary transition-colors">{{ product.name }}</h3>
-                        <p class="text-sm text-marplata-text-light">{{ product.base_price|floatformat:0 }}</p>
+                        <p class="text-sm text-marplata-text-light">{{ product.base_price|price }}</p>
                     </div>
                 </a>
                 {% endfor %}

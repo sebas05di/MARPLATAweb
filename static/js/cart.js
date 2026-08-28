@@ -181,4 +181,31 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
+
+  var welcomeCouponApply = document.getElementById('welcomeCouponApply');
+  if (welcomeCouponApply) {
+    welcomeCouponApply.addEventListener('click', function (e) {
+      e.preventDefault();
+      var code = this.getAttribute('data-code');
+      if (!code) return;
+
+      var formData = new FormData();
+      formData.append('code', code);
+
+      fetch('/carrito/api/coupon/apply/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        body: formData,
+      })
+      .then(function (response) { return response.json(); })
+      .then(function (data) {
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert(data.error || 'No se pudo aplicar el cupón.');
+        }
+      })
+      .catch(function () { alert('Error de conexión.'); });
+    });
+  }
 });

@@ -232,6 +232,14 @@ nav[class*="bg-transparent"] a[aria-label="Mi perfil"]:hover svg {
     letter-spacing: 0.25em;
   }
 
+  .page-section {
+    @apply pt-6 pb-12 lg:pt-8 lg:pb-16;
+  }
+
+  .page-title {
+    @apply text-center mb-6 lg:mb-8;
+  }
+
   .image-placeholder {
     @apply relative overflow-hidden bg-gradient-to-br from-marplata-secondary-light to-marplata-neutral;
   }
