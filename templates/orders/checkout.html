@@ -38,22 +38,22 @@
             <div class="flex-1 min-w-0">
               <p class="text-marplata-text font-medium leading-tight">{{ item.product_name }}</p>
               <p class="text-marplata-text-muted text-xs">{{ item.color }} · {{ item.size }}</p>
-              <p class="text-marplata-text-light text-xs mt-1">{{ item.quantity }} × {{ item.unit_price|price }}</p>
+              <p class="text-marplata-text-light text-xs mt-1">{{ item.quantity }} × ${{ item.unit_price|price }}</p>
             </div>
-            <p class="text-marplata-text font-medium whitespace-nowrap">{{ item.subtotal|price }}</p>
+            <p class="text-marplata-text font-medium whitespace-nowrap">${{ item.subtotal|price }}</p>
           </div>
           {% endfor %}
         </div>
         <div class="border-t border-marplata-secondary pt-3 space-y-1 text-sm">
-          <div class="flex justify-between"><span class="text-marplata-text-light">Subtotal</span><span class="text-marplata-text">{{ cart_data.subtotal|price }}</span></div>
+          <div class="flex justify-between"><span class="text-marplata-text-light">Subtotal</span><span class="text-marplata-text">${{ cart_data.subtotal|price }}</span></div>
           {% if cart_data.discount %}
-          <div class="flex justify-between text-marplata-success"><span>Descuento{% if cart_data.coupon.code %} ({{ cart_data.coupon.code }}){% endif %}</span><span>-{{ cart_data.discount|price }}</span></div>
+          <div class="flex justify-between text-marplata-success"><span>Descuento{% if cart_data.coupon.code %} ({{ cart_data.coupon.code }}){% endif %}</span><span>-${{ cart_data.discount|price }}</span></div>
           {% endif %}
           <div class="flex justify-between text-marplata-text-muted text-xs"><span>Envío</span><span>Se confirma por WhatsApp</span></div>
         </div>
         <div class="border-t border-marplata-secondary mt-3 pt-3 flex justify-between font-heading text-lg">
           <span class="text-marplata-text">Subtotal</span>
-          <span class="text-marplata-primary">{{ cart_data.total|price }}</span>
+          <span class="text-marplata-primary">${{ cart_data.total|price }}</span>
         </div>
 
         <button type="submit" class="btn-primary w-full mt-6 py-4 text-sm tracking-widest">

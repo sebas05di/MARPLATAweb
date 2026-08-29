@@ -4,19 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% if page_meta_title %}
-    <title>{{ page_meta_title }} | MARPLATA</title>
-    {% elif page_title %}
-    <title>{{ page_title }} | MARPLATA</title>
-    {% else %}
-    <title>MARPLATA — Diseña tu estilo, resalta tu esencia</title>
-    {% endif %}
+    <title>{% block title %}{% if page_meta_title %}{{ page_meta_title }} | MARPLATA{% elif page_title %}{{ page_title }} | MARPLATA{% else %}MARPLATA — Diseña tu estilo, resalta tu esencia{% endif %}{% endblock %}</title>
     {% if page_meta_description %}
     <meta name="description" content="{{ page_meta_description }}">
     {% else %}
     <meta name="description" content="{{ site_config.site_tagline|default:'Diseña tu estilo, resalta tu esencia' }}">
     {% endif %}
     <meta name="theme-color" content="#6B8BC8">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
     <meta property="og:site_name" content="{{ site_config.site_name|default:'MARPLATA' }}">
     <meta property="og:title" content="{% if page_meta_title %}{{ page_meta_title }}{% else %}MARPLATA — Diseña tu estilo, resalta tu esencia{% endif %} | MARPLATA">
     <meta property="og:description" content="{% if page_meta_description %}{{ page_meta_description }}{% else %}{{ site_config.site_tagline|default:'Diseña tu estilo, resalta tu esencia' }}{% endif %}">
@@ -29,11 +24,6 @@
     <meta name="twitter:description" content="{% if page_meta_description %}{{ page_meta_description }}{% else %}{{ site_config.site_tagline|default:'Diseña tu estilo, resalta tu esencia' }}{% endif %}">
     <meta name="twitter:image" content="{% if og_image %}{{ og_image }}{% else %}{{ default_og_image }}{% endif %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
-    <link rel="icon" type="image/x-icon" href="{% static 'img/favicons/favicon.ico' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicons/favicon-16x16.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicons/favicon-32x32.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicons/apple-touch-icon.png' %}">
-    <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static price_format %}
 
 {% block navbar_class %}sticky top-0 z-50 bg-white border-b border-marplata-secondary-light{% endblock %}
 
@@ -45,7 +45,7 @@
                 </div>
                 <div>
                     <p class="text-xs uppercase tracking-wide-custom text-marplata-text-muted">WhatsApp</p>
-                    <p class="text-sm font-medium text-marplata-text">{{ site_config.whatsapp_number }}</p>
+                    <p class="text-sm font-medium text-marplata-text">{{ site_config.whatsapp_number|format_whatsapp }}</p>
                 </div>
             </a>
             {% endif %}
