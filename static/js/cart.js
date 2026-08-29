@@ -63,7 +63,9 @@ document.addEventListener('DOMContentLoaded', function () {
           subtotalEl.textContent = '$' + Number(data.subtotal).toLocaleString('es-CO');
         }
         updateTotals(data.total_items, data.total, data.cart_subtotal, data.discount);
-        updateCartCounter(data.total_items);
+        if (typeof window.updateCartCounter === 'function') {
+          window.updateCartCounter(data.total_items);
+        }
         input.value = quantity;
       } else if (data.error) {
         alert(data.error);
@@ -86,7 +88,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if (data.success) {
         cartItem.remove();
         updateTotals(data.total_items, data.total, data.subtotal, data.discount);
-        updateCartCounter(data.total_items);
+        if (typeof window.updateCartCounter === 'function') {
+          window.updateCartCounter(data.total_items);
+        }
 
         if (data.total_items === 0) {
           window.location.reload();
@@ -104,13 +108,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (totalFinalEl) {
       totalFinalEl.textContent = '$' + Number(total).toLocaleString('es-CO');
-    }
-  }
-
-  function updateCartCounter(count) {
-    var counter = document.getElementById('cartCount');
-    if (counter) {
-      counter.textContent = count;
     }
   }
 

@@ -536,7 +536,9 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(function (data) {
       if (data.success) {
-        updateCartCounter(data.total_items);
+        if (typeof window.updateCartCounter === 'function') {
+          window.updateCartCounter(data.total_items);
+        }
         onSuccess(button, originalText);
       } else {
         button.textContent = data.error || 'No se pudo agregar';
@@ -584,24 +586,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
-
-  function updateCartCounter(count) {
-    var cartCountEl = document.getElementById('cartCount');
-    if (cartCountEl) {
-      cartCountEl.textContent = count;
-    }
-  }
-
-  function loadCartCount() {
-    fetch('/carrito/api/summary/')
-      .then(function (response) { return response.json(); })
-      .then(function (data) {
-        updateCartCounter(data.total_items);
-      })
-      .catch(function () {});
-  }
-
-  loadCartCount();
 
   if (variants.length > 0) {
     selectColor(variants[0].color_slug);
