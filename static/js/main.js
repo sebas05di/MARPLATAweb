@@ -86,69 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* Footer registration form */
-  const footerRegisterForm = document.getElementById('footerRegisterForm');
-  const registerExtraFields = document.getElementById('registerExtraFields');
-  const footerEmailInput = footerRegisterForm ? footerRegisterForm.querySelector('input[name="email"]') : null;
-
-  if (footerEmailInput && registerExtraFields) {
-    footerEmailInput.addEventListener('input', function () {
-      if (footerEmailInput.value.trim().length > 0) {
-        registerExtraFields.classList.remove('hidden');
-        registerExtraFields.classList.add('grid');
-      }
-    });
-  }
-
-  if (footerRegisterForm) {
-    footerRegisterForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var submitBtn = footerRegisterForm.querySelector('button[type="submit"]');
-      var originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Procesando...';
-      submitBtn.disabled = true;
-
-      var formData = new FormData(footerRegisterForm);
-      var data = {
-        email: formData.get('email'),
-        first_name: formData.get('first_name'),
-        last_name: formData.get('last_name'),
-        phone: formData.get('phone'),
-        password: formData.get('password')
-      };
-
-      fetch('/cuenta/api/registro/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCsrfToken()
-        },
-        body: JSON.stringify(data)
-      })
-      .then(function (response) { return response.json(); })
-      .then(function (result) {
-        if (result.success) {
-          submitBtn.textContent = '¡Registrado!';
-          submitBtn.classList.remove('bg-marplata-primary', 'hover:bg-marplata-primary-dark');
-          submitBtn.classList.add('bg-emerald-600');
-          setTimeout(function () {
-            window.location.reload();
-          }, 1200);
-        } else {
-          var errorMsg = result.errors ? result.errors.join('\n') : (result.error || 'Error al registrarse');
-          alert(errorMsg);
-          submitBtn.textContent = originalText;
-          submitBtn.disabled = false;
-        }
-      })
-      .catch(function () {
-        alert('Error de conexión');
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      });
-    });
-  }
-
   function getCsrfToken() {
     var cookie = document.cookie.match(/csrftoken=([^;]+)/);
     if (cookie) return cookie[1];
@@ -236,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* Footer newsletter (logged-in users) */
+  /* Footer newsletter */
   var newsletterForm = document.getElementById('footerNewsletterForm');
   if (newsletterForm) {
     newsletterForm.addEventListener('submit', function (e) {

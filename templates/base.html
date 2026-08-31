@@ -203,27 +203,6 @@
             </div>
         </div>
 
-        {% if not user.is_authenticated %}
-        <div class="mt-12 lg:mt-16 pt-12 lg:pt-16 border-t border-white/10">
-            <div class="max-w-xl mx-auto text-center">
-                <h3 class="font-heading text-2xl lg:text-3xl font-light tracking-tight-custom mb-3">Sé parte de MAR PLATA</h3>
-                <p class="text-white/60 text-sm mb-6">Regístrate para recibir lanzamientos exclusivos y completar tu compra más fácil.</p>
-                <form id="footerRegisterForm" class="space-y-4">
-                    <input type="email" name="email" placeholder="Correo electrónico" required class="w-full px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
-                    <div id="registerExtraFields" class="hidden grid-cols-2 gap-4">
-                        <input type="text" name="first_name" placeholder="Nombre" class="col-span-2 sm:col-span-1 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
-                        <input type="text" name="last_name" placeholder="Apellido" class="col-span-2 sm:col-span-1 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
-                        <input type="tel" name="phone" placeholder="Teléfono" class="col-span-2 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
-                        <input type="password" name="password" placeholder="Contraseña" class="col-span-2 px-5 py-4 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-marplata-primary-light transition-colors">
-                    </div>
-                    <button type="submit" class="w-full py-4 bg-marplata-primary text-white text-xs font-normal uppercase tracking-[0.2em] hover:bg-marplata-primary-dark transition-colors">
-                        Registrarme
-                    </button>
-                </form>
-                <p class="mt-4 text-xs text-white/40">¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}" class="text-white/70 hover:text-white underline">Inicia sesión</a></p>
-            </div>
-        </div>
-        {% else %}
         <div class="mt-12 lg:mt-16 pt-12 lg:pt-16 border-t border-white/10">
             <div class="max-w-xl mx-auto text-center">
                 <h3 class="font-heading text-2xl lg:text-3xl font-light tracking-tight-custom mb-3">¿Quieres novedades exclusivas?</h3>
@@ -237,7 +216,6 @@
                 <p id="newsletterMessage" class="mt-4 text-xs hidden"></p>
             </div>
         </div>
-        {% endif %}
     </div>
         <div class="border-t border-white/10">
             <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
