@@ -23,12 +23,12 @@
     {% csrf_token %}
 
     <div class="lg:col-span-1">
-      <div class="bg-marplata-neutral border border-marplata-secondary rounded-lg p-6 sticky top-24">
+      <div class="bg-white border border-marplata-secondary rounded-lg p-6 sticky top-24">
         <h2 class="font-heading text-lg text-marplata-text mb-4">Resumen del pedido</h2>
         <div class="space-y-3 mb-4 max-h-80 overflow-y-auto">
           {% for item in cart_data.items %}
           <div class="flex gap-3 text-sm">
-            <div class="w-16 h-20 bg-marplata-secondary-light rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div class="w-16 h-20 bg-white rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
               {% if item.image_url %}
               <img src="{{ item.image_url }}" alt="{{ item.product_name }}" class="w-full h-full object-cover">
               {% else %}

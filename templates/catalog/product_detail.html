@@ -2,7 +2,7 @@
 {% load static price_format l10n %}
 
 {% block content %}
-<section class="py-10 lg:py-16 bg-marplata-neutral">
+<section class="py-10 lg:py-16 bg-white">
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="flex items-center gap-3 text-xs text-marplata-text-muted mb-10 lg:mb-14" itemscope itemtype="https://schema.org/BreadcrumbList">
@@ -38,7 +38,7 @@
         <div class="grid lg:grid-cols-2 gap-10 lg:gap-20">
             <!-- Gallery (columna izquierda) -->
             <div class="lg:sticky lg:top-28 lg:self-start">
-                <div class="relative aspect-[3/4] overflow-hidden bg-marplata-secondary-light rounded-lg cursor-crosshair group" id="mainImageContainer">
+                <div class="relative aspect-[3/4] overflow-hidden bg-white rounded-lg cursor-crosshair group" id="mainImageContainer">
                     <img id="mainImage" src="{{ product.primary_image.url|default:'' }}" alt="{{ product.name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02] cursor-zoom-in">
                     <div id="zoomLens" class="absolute w-28 h-28 rounded-full border-2 border-marplata-primary bg-white/10 pointer-events-none opacity-0 transition-opacity duration-200 shadow-[0_0_0_4px_rgba(107,139,200,0.1)]"></div>
                     <button type="button" id="openLightboxBtn" class="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm text-marplata-text hover:text-marplata-primary transition-colors shadow-soft opacity-0 group-hover:opacity-100" aria-label="Ver imagen ampliada">
