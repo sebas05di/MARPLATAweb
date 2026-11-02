@@ -252,7 +252,7 @@ window.productData = {
             "color_slug": "{{ variant.color_slug|escapejs }}",
             "top_size": "{{ variant.top_size|escapejs }}",
             "bottom_size": "{{ variant.bottom_size|escapejs }}",
-            "stock": {{ variant.stock }},
+            "in_stock": {% if variant.stock > 0 %}true{% else %}false{% endif %},
             "price_override": {% if variant.price_override %}{{ variant.price_override|unlocalize }}{% else %}null{% endif %},
             "images": [
                 {% for img in variant.images.all %}
@@ -269,7 +269,7 @@ window.productData = {
 };
 {% endlocalize %}
 </script>
-<script src="{% static 'js/product-detail.js' %}?v=4"></script>
+<script src="{% static 'js/product-detail.js' %}?v=5"></script>
 <script src="{% static 'js/quantity-selector.js' %}"></script>
 {% if user.is_authenticated %}
 <script src="{% static 'js/wishlist.js' %}"></script>

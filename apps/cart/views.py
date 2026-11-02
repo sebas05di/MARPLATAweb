@@ -59,7 +59,6 @@ def get_cart_items(request):
                 'quantity': quantity,
                 'unit_price': float(unit_price),
                 'subtotal': float(item_subtotal),
-                'stock': variant.stock,
                 'image_url': primary_image,
             })
         except ProductVariant.DoesNotExist:

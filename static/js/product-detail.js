@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.setAttribute('aria-label', prefix + ' ' + size);
 
       var variant = getVariant(selectedColor, prefix === 'Top' ? size : selectedTopSize, prefix === 'Tanga' ? size : selectedBottomSize);
-      if (variant && variant.stock <= 0) {
+      if (variant && !variant.in_stock) {
         btn.classList.add('opacity-40', 'cursor-not-allowed', 'line-through');
         btn.title = 'Agotado';
       }
@@ -314,8 +314,8 @@ document.addEventListener('DOMContentLoaded', function () {
       var price = variant.price_override || basePrice;
       productPrice.textContent = formatPrice(price);
 
-      if (variant.stock > 0) {
-        stockStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Disponible (' + variant.stock + ' unidades)';
+      if (variant.in_stock) {
+        stockStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Disponible';
         stockStatus.className = 'product-detail__stock-status inline-flex items-center gap-2 text-sm font-medium text-emerald-600';
         addToCartBtn.disabled = false;
         if (buyWhatsappBtn) buyWhatsappBtn.disabled = false;

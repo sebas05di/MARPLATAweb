@@ -93,8 +93,7 @@ def checkout_whatsapp(request):
                 if variant.stock < item['quantity']:
                     size_label = item.get('size', '')
                     raise ValueError(
-                        f"Stock insuficiente para {item['product_name']} ({item['color']} / {size_label}). "
-                        f"Stock disponible: {variant.stock}"
+                        f"Stock insuficiente para {item['product_name']} ({item['color']} / {size_label})."
                     )
 
             order = WhatsAppOrder.objects.create(

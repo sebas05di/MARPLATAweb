@@ -36,7 +36,7 @@
                         <div class="flex items-center justify-between mt-4">
                             <div class="inline-flex items-center border border-marplata-secondary-light">
                                 <button class="cart-item__qty-btn--minus w-9 h-9 flex items-center justify-center text-marplata-text-light hover:bg-marplata-neutral transition-colors" data-variant-id="{{ item.variant_id }}" aria-label="Reducir cantidad">−</button>
-                                <input type="number" class="cart-item__qty-input w-11 h-9 text-center text-sm text-marplata-text border-x border-marplata-secondary-light focus:outline-none" value="{{ item.quantity }}" min="1" max="{{ item.stock }}" data-variant-id="{{ item.variant_id }}">
+                                <input type="number" class="cart-item__qty-input w-11 h-9 text-center text-sm text-marplata-text border-x border-marplata-secondary-light focus:outline-none" value="{{ item.quantity }}" min="1" max="99" data-variant-id="{{ item.variant_id }}">
                                 <button class="cart-item__qty-btn--plus w-9 h-9 flex items-center justify-center text-marplata-text-light hover:bg-marplata-neutral transition-colors" data-variant-id="{{ item.variant_id }}" aria-label="Aumentar cantidad">+</button>
                             </div>
                             <span class="cart-item__subtotal-value text-base font-medium text-marplata-text" data-variant-id="{{ item.variant_id }}">${{ item.subtotal|price }}</span>
